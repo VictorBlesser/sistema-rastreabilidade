@@ -1,0 +1,198 @@
+:root {
+    color-scheme: light;
+
+    /* Escala harmonica: todos os espacamentos partem de 4 px. */
+    --unit: 0.25rem;
+    --space-1: var(--unit);
+    --space-2: calc(var(--space-1) + var(--space-1));
+    --space-3: calc(var(--space-2) + var(--space-1));
+    --space-4: calc(var(--space-2) + var(--space-2));
+    --space-5: calc(var(--space-4) + var(--space-1));
+    --space-6: calc(var(--space-4) + var(--space-2));
+    --space-8: calc(var(--space-4) + var(--space-4));
+    --space-10: calc(var(--space-8) + var(--space-2));
+    --space-12: calc(var(--space-8) + var(--space-4));
+    --space-16: calc(var(--space-8) + var(--space-8));
+    --space-20: calc(var(--space-16) + var(--space-4));
+
+    --radius-sm: var(--space-2);
+    --radius-md: var(--space-4);
+    --radius-lg: var(--space-6);
+
+    --page-max: 60rem;
+    --text-max: 42.5rem;
+    --page-gutter: var(--space-6);
+
+    /* Paleta Noite Clinica: Bright Nights / J.A Produtos Medicos. */
+    --color-background: #cfcdcd;
+    --color-surface: #ffffff;
+    --color-surface-soft: #e8f4f8;
+    --color-text: #172b3a;
+    --color-text-soft: #526a7a;
+    --color-primary: #102a43;
+    --color-secondary: #176b87;
+    --color-accent: #19b5a5;
+    --color-border: #d7e3e9;
+
+    /* Cores funcionais tipo Situação: Aprovado, Atenção, Bloqueado, Informação, Quarentena, Inativo.*/
+    --color-success: #237a57;
+    --color-warning: #a15c00;
+    --color-danger: #b42318;
+    --color-quarantine: #6941c6;
+    --color-inactive: #667085;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--color-background);
+    color: var(--color-text);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(circle at top right, rgba(25, 181, 165, 0.14), transparent 35%),
+        var(--color-background);
+}
+
+::selection {
+    background: var(--color-accent);
+    color: var(--color-primary);
+}
+
+:focus-visible {
+    outline: var(--space-1) solid var(--color-secondary);
+    outline-offset: var(--space-1);
+}
+
+.container {
+    width: min(var(--page-max), calc(100% - var(--page-gutter) - var(--page-gutter)));
+    margin-inline: auto;
+    padding-block: var(--space-16);
+}
+
+.tag {
+    margin: 0 0 var(--space-4);
+    color: var(--color-secondary);
+    font-size: calc(var(--space-3) + 0.0625rem);
+    font-weight: 800;
+    letter-spacing: calc(var(--unit) - 0.0625rem);
+}
+
+h1,
+h2,
+p {
+    text-wrap: balance;
+}
+
+h1 {
+    max-width: var(--text-max);
+    margin: 0;
+    color: var(--color-primary);
+    font-size: clamp(var(--space-8), 8vw, var(--space-16));
+    line-height: 0.98;
+    letter-spacing: -0.055rem;
+}
+
+h2 {
+    margin: 0 0 var(--space-6);
+    color: var(--color-primary);
+    font-size: clamp(var(--space-6), 4vw, var(--space-8));
+    line-height: 1.15;
+    letter-spacing: -0.025rem;
+}
+
+.intro {
+    max-width: var(--text-max);
+    margin: var(--space-6) 0 0;
+    color: var(--color-text-soft);
+    font-size: calc(var(--space-4) + 0.125rem);
+    line-height: 1.65;
+}
+
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-block: var(--space-12);
+    padding: var(--space-6) var(--space-8);
+    border: 1px solid var(--color-border);
+    border-left: var(--space-2) solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: 0 var(--space-3) var(--space-10) rgba(16, 42, 67, 0.09);
+}
+
+.card span {
+    color: var(--color-text-soft);
+}
+
+.card strong {
+    color: var(--color-primary);
+    font-size: calc(var(--space-4) + 0.0625rem);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+}
+
+article {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: calc(var(--space-20) + var(--space-2));
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(16, 42, 67, 0.05);
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+article:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 var(--space-3) var(--space-8) rgba(16, 42, 67, 0.11);
+    transform: translateY(calc(0px - var(--space-1)));
+}
+
+article b {
+    display: grid;
+    flex: 0 0 var(--space-10);
+    width: var(--space-10);
+    height: var(--space-10);
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-surface-soft);
+    color: var(--color-secondary);
+    font-size: calc(var(--space-3) + 0.125rem);
+}
+
+article span {
+    color: var(--color-text);
+    line-height: 1.45;
+}
+
+@media (max-width: 620px) {
+    :root {
+        --page-gutter: var(--space-4);
+    }
+
+    .container {
+        padding-block: var(--space-12);
+    }
+
+    .card {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: var(--space-5);
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
