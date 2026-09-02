@@ -1,5 +1,24 @@
 # Requisitos — Cadastro de Produtos
 
+## Estado da implementação em 2 de setembro de 2026
+
+| Item | Estado | Evidência atual |
+|---|---|---|
+| Entidade `Produto` e enum `TipoProduto` | Implementado | Classes Java e mapeamento JPA |
+| Tabela `produto` | Implementado | Migração `V2__criar_tabela_produto.sql` |
+| Acesso ao banco | Implementado | `ProdutoRepository` estende `JpaRepository` |
+| Cadastro pelo serviço | Implementado | `ProdutoService.cadastrar()` e teste unitário |
+| Recusa de código duplicado | Implementado e testado | `existsByCodigoIgnoreCase` e `deveRecusarCadastroQuandoCodigoJaExiste` |
+| Listagem por nome | Implementado e testado | `ProdutoService.listar()` e `deveListarProdutosOrdenadosPorNome` |
+| Criação como ativo e inativação | Implementado e testado | Métodos e testes da entidade `Produto` |
+| Normalização do código | Implementado e testado | Construtor de `Produto` e `deveNormalizarCodigoDoProduto` |
+| Validação dos campos obrigatórios | Implementado e testado | Construtor e testes de código, nome e tipo |
+| Objeto de entrada do formulário | Implementado | `ProdutoForm` com validações Jakarta |
+| Telas e rotas web de Produtos | Pendente | `ProdutoController` e templates ainda não existem |
+| Consulta, edição e inativação pelo navegador | Pendente | Depende das rotas e telas |
+
+`Implementado` significa presente no código atual. Não significa que o módulo esteja validado ou liberado para produção.
+
 ## 1. Objetivo
 
 Permitir o cadastro e a consulta dos produtos controlados pelo Sistema JA. O cadastro será a base para os módulos futuros de lotes, recebimento, estoque, expedição, devolução e rastreabilidade.
@@ -83,7 +102,7 @@ Esses valores deverão ser definidos pelo `enum` `TipoProduto`, evitando textos 
 
 ### RN-PRO-001 — Código único
 
-Antes de salvar, o sistema deve verificar se já existe outro produto com o mesmo código.
+Antes de salvar, o sistema deve verificar, sem diferenciar letras maiúsculas e minúsculas, se já existe outro produto com o mesmo código. A tabela também deve manter uma restrição de unicidade como segunda proteção.
 
 ### RN-PRO-002 — Normalização do código
 
@@ -108,7 +127,22 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 | Inativar produto | Produto permanece no banco com `ativo = false` |
 | Consultar identificador inexistente | Sistema informa que o produto não foi encontrado |
 
-## 9. Referências do projeto
+## 9. Rastreabilidade dos testes atuais
+
+| Teste | Regra ou requisito verificado |
+|---|---|
+| `deveCriarProdutoAtivo` | Novo produto inicia com `ativo = true` |
+| `deveInativarProduto` | RN-PRO-003 e REQ-PRO-009 |
+| `deveCadastrarProdutoQuandoCodigoNaoExiste` | REQ-PRO-001 |
+| `deveRecusarCadastroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 |
+| `deveListarProdutosOrdenadosPorNome` | REQ-PRO-006 |
+| `deveNormalizarCodigoDoProduto` | RN-PRO-002 e REQ-PRO-011 |
+| `deveRecusarCodigoEmBranco` | REQ-PRO-003 |
+| `deveRecusarNomeEmBranco` | REQ-PRO-003 |
+| `deveRecusarTipoNulo` | REQ-PRO-003 |
+| `contextLoads` | A aplicação Spring inicia no perfil de testes e valida as migrações |
+
+## 10. Referências do projeto
 
 - RDC 430/2020;
 - RDC 665/2022;

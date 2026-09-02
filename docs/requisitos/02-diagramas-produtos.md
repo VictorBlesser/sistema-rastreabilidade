@@ -2,6 +2,8 @@
 
 ## 1. Organização das pastas
 
+### Arquivos existentes
+
 ```text
 src/main/java/br/com/japrodutos/sistema/
 └── produto/
@@ -9,20 +11,31 @@ src/main/java/br/com/japrodutos/sistema/
     ├── Produto.java
     ├── ProdutoRepository.java
     ├── ProdutoService.java
-    └── ProdutoController.java
+    └── ProdutoForm.java
 
 src/main/resources/
-├── db/migration/
-│   └── V2__criar_tabela_produto.sql
-└── templates/produtos/
-    ├── lista.html
-    ├── formulario.html
-    └── detalhe.html
+└── db/migration/
+    └── V2__criar_tabela_produto.sql
 
 src/test/java/br/com/japrodutos/sistema/
 └── produto/
-    ├── ProdutoServiceTest.java
-    └── ProdutoControllerTest.java
+    ├── ProdutoTest.java
+    └── ProdutoServiceTest.java
+```
+
+### Arquivos planejados para concluir o módulo
+
+```text
+src/main/java/br/com/japrodutos/sistema/produto/
+└── ProdutoController.java
+
+src/main/resources/templates/produtos/
+├── lista.html
+├── formulario.html
+└── detalhe.html
+
+src/test/java/br/com/japrodutos/sistema/produto/
+└── ProdutoControllerTest.java
 ```
 
 ## 2. Diagrama de classes
@@ -45,56 +58,60 @@ classDiagram
         -boolean controlaLote
         -boolean controlaValidade
         -boolean ativo
-        -Instant criadoEm
-        -Instant atualizadoEm
-        +normalizarCodigo() void
+        +Produto(String codigo, String nome, TipoProduto tipo, boolean controlaLote, boolean controlaValidade)
         +inativar() void
+        +getCodigo() String
+        +getNome() String
+        +getTipo() TipoProduto
+        +isAtivo() boolean
     }
 
     class ProdutoRepository {
         <<interface>>
-        +findByCodigo(String codigo) Optional~Produto~
-        +existsByCodigo(String codigo) boolean
-        +findAllByOrderByNomeAsc() List~Produto~
+        +existsByCodigoIgnoreCase(String codigo) boolean
+        +save(Produto produto) Produto
+        +findAll(Sort ordenacao) List~Produto~
     }
 
     class ProdutoService {
         -ProdutoRepository repository
         +cadastrar(Produto produto) Produto
         +listar() List~Produto~
-        +buscarPorId(Long id) Produto
-        +inativar(Long id) void
     }
 
-    class ProdutoController {
-        -ProdutoService service
-        +listar(Model model) String
-        +abrirFormulario(Model model) String
-        +cadastrar(Produto produto) String
-        +detalhar(Long id, Model model) String
+    class ProdutoForm {
+        -String codigo
+        -String nome
+        -String descricao
+        -TipoProduto tipo
+        -boolean controlaLote
+        -boolean controlaValidade
     }
 
     Produto --> TipoProduto : possui um tipo
     ProdutoRepository --> Produto : persiste
     ProdutoService --> ProdutoRepository : utiliza
     ProdutoService --> Produto : aplica regras
-    ProdutoController --> ProdutoService : solicita operacoes
+    ProdutoForm --> TipoProduto : recebe o tipo selecionado
 ```
 
-As operações mostradas são uma referência de organização, não uma obrigação de copiar todos os métodos imediatamente.
+Este diagrama mostra somente o que já existe. `save` e `findAll` são herdados de `JpaRepository`; não precisam ser escritos novamente na interface.
 
-## 3. Como uma requisição percorre o sistema
+Durante a construção de `Produto`, o código recebido é normalizado com `trim()` e `toUpperCase(Locale.ROOT)` antes de ser armazenado no campo `codigo`.
+
+## 3. Fluxo implementado no serviço
 
 ```mermaid
 flowchart LR
-    A[formulario.html] -->|POST /produtos| B[ProdutoController]
-    B -->|cadastrar produto| C[ProdutoService]
-    C -->|verificar codigo| D[ProdutoRepository]
-    C -->|salvar| D
-    D -->|INSERT ou SELECT| E[(Banco de dados)]
-    C -->|produto salvo| B
-    B -->|redirecionar| F[lista.html]
+    A[Código informado] -->|remover espaços e converter para maiúsculas| N[Objeto Produto]
+    N -->|cadastrar| B[ProdutoService]
+    B -->|consultar código sem diferenciar maiúsculas| C[ProdutoRepository]
+    C -->|existe| D[Recusar cadastro]
+    C -->|não existe| E[Salvar produto]
+    E --> F[(Tabela produto)]
 ```
+
+O fluxo pelo navegador será acrescentado quando `ProdutoController` e as telas forem implementados.
 
 ## 4. Diagrama de objetos
 
@@ -102,13 +119,11 @@ O diagrama de classes mostra os moldes. O diagrama de objetos mostra exemplos qu
 
 ```mermaid
 flowchart LR
-    C["produtoController : ProdutoController"]
     S["produtoService : ProdutoService"]
     R["produtoRepository : ProdutoRepository"]
     P["produtoA : Produto<br/>id = 1<br/>codigo = CAT-001<br/>nome = Cateter<br/>tipo = PRODUTO_MEDICO<br/>controlaLote = true<br/>ativo = true"]
     T["PRODUTO_MEDICO : TipoProduto"]
 
-    C -->|possui referencia| S
     S -->|possui referencia| R
     R -->|carrega e salva| P
     P -->|valor do campo tipo| T
@@ -126,7 +141,13 @@ Método  = comportamento do objeto: inativar()
 Exemplo conceitual:
 
 ```java
-Produto produtoA = new Produto();
+Produto produtoA = new Produto(
+        "CAT-001",
+        "Cateter",
+        TipoProduto.PRODUTO_MEDICO,
+        true,
+        true
+);
 ```
 
-`Produto` é a classe. `produtoA` é a variável que referencia um objeto dessa classe. `new Produto()` cria o objeto.
+`Produto` é a classe. `produtoA` é a variável que referencia um objeto dessa classe. `new Produto(...)` chama o construtor e cria o objeto.

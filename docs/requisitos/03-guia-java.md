@@ -167,7 +167,7 @@ Produto produto = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
 ```
 
-## 8. Interface
+## 8. Interface e Spring Data
 
 Uma interface define operações sem precisar implementar todas elas no mesmo arquivo:
 
@@ -177,14 +177,23 @@ public interface ProdutoRepository {
 }
 ```
 
-No projeto, o `ProdutoRepository` futuramente poderá estender uma interface do Spring:
+No projeto, o `ProdutoRepository` já estende uma interface do Spring:
 
 ```java
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+    boolean existsByCodigoIgnoreCase(String codigo);
 }
 ```
 
-`Produto` indica a entidade administrada. `Long` indica o tipo do identificador.
+`Produto` indica a entidade administrada. `Long` indica o tipo do identificador. Métodos como `save` e `findAll` são herdados de `JpaRepository`.
+
+O nome `existsByCodigoIgnoreCase` é interpretado pelo Spring:
+
+```text
+exists     verifica se existe
+ByCodigo   utiliza o campo codigo
+IgnoreCase ignora diferença entre maiúsculas e minúsculas
+```
 
 ## 9. Anotações
 
@@ -238,13 +247,44 @@ Arquivo:             mesmo nome da classe pública
 
 Java diferencia maiúsculas e minúsculas. `Produto`, `produto` e `PRODUTO` são nomes diferentes.
 
-## 12. Sequência recomendada para programar
+## 12. Sequência de desenvolvimento
+
+As etapas iniciais concluídas foram:
 
 1. Crie `TipoProduto.java`.
 2. Confirme que o projeto ainda compila.
 3. Crie a estrutura inicial de `Produto.java`.
 4. Adicione poucos campos por vez.
 5. Corrija os avisos antes de continuar.
-6. Só depois avance para banco, repositório e serviço.
+6. Avance para banco, repositório e serviço.
+
+O projeto já concluiu essa sequência. A etapa atual é normalizar e validar os dados antes de criar o formulário e o controlador web.
 
 Quando ocorrer um erro, leia primeiro a primeira mensagem que aponta para um arquivo do seu projeto. Anote o nome do arquivo, a linha e a mensagem; essas três informações normalmente são suficientes para investigar o problema.
+
+## 13. Estrutura de um teste com Mockito
+
+O teste do serviço substitui temporariamente o repositório real por um objeto controlado chamado `mock`:
+
+```java
+when(repository.existsByCodigoIgnoreCase("CAT-001"))
+        .thenReturn(true);
+
+IllegalArgumentException erro = assertThrows(
+        IllegalArgumentException.class,
+        () -> service.cadastrar(produto)
+);
+
+assertEquals("Código já cadastrado", erro.getMessage());
+verify(repository, never()).save(produto);
+```
+
+Leitura do teste:
+
+| Trecho | Significado |
+|---|---|
+| `when(...).thenReturn(true)` | Prepara a resposta simulada do repositório |
+| `assertThrows` | Confirma que a operação lançou a exceção esperada |
+| `assertEquals` | Compara o resultado esperado com o resultado obtido |
+| `verify` | Confirma se um método foi ou não chamado |
+| `never()` | Exige que `save` não seja executado |

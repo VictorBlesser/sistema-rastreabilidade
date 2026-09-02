@@ -1,5 +1,7 @@
 package br.com.japrodutos.sistema.produto;
 
+import java.util.Locale;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,36 +21,46 @@ public class Produto {
 
     @Column(nullable = false, unique = true, length = 50)
     private String codigo;
-    
+
     @Column(nullable = false, length = 150)
     private String nome;
-    
+
     @Column(length = 500)
     private String descricao;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private TipoProduto tipo;
-    
+
     @Column(name = "controla_lote", nullable = false)
     private boolean controlaLote;
-    
+
     @Column(name = "controla_validade", nullable = false)
     private boolean controlaValidade;
-    
+
     @Column(nullable = false)
     private boolean ativo;
 
-     protected Produto() {
+    protected Produto() {
     }
+
     public Produto(
             String codigo,
             String nome,
             TipoProduto tipo,
             boolean controlaLote,
             boolean controlaValidade) {
+        if (codigo == null || codigo.isBlank()) {
+            throw new IllegalArgumentException("O código é obrigatório");
+        }
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("O nome é obrigatório");
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("O tipo é obrigatório");
+        }
 
-        this.codigo = codigo;
+        this.codigo = codigo.trim().toUpperCase(Locale.ROOT);
         this.nome = nome;
         this.tipo = tipo;
         this.controlaLote = controlaLote;
