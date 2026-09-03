@@ -147,6 +147,6 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 - RDC 430/2020;
 - RDC 665/2022;
 - Guia Anvisa nº 33/2020;
-- procedimentos internos da J.A Produtos Médicos.
+- procedimentos internos e requisitos regulatórios aplicáveis.
 
 A correspondência entre cada requisito do sistema, os artigos aplicáveis e os procedimentos internos será detalhada em uma futura matriz de rastreabilidade regulatória.
