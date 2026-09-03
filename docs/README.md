@@ -11,16 +11,16 @@ Esta pasta reúne a documentação funcional e técnica do projeto. Ela deve evo
 
 ## Estado atual
 
-Atualizado em 2 de setembro de 2026.
+Atualizado em 3 de setembro de 2026.
 
-- progresso estimado do projeto completo: 13%;
-- progresso estimado do módulo Produtos: 82%;
+- progresso estimado do projeto completo: 14%;
+- progresso estimado do módulo Produtos: 86%;
 - entidade, tabela, repositório e serviço básicos implementados;
 - criação como ativo, inativação, recusa de código duplicado e listagem ordenada cobertas por testes;
 - normalização do código implementada e coberta por teste;
 - código, nome e tipo são validados como campos obrigatórios;
-- `ProdutoForm` implementado com validações para a futura tela;
-- `ProdutoController` é a próxima classe planejada;
+- `ProdutoForm` implementado com validações e conversão segura para `Produto`;
+- `ProdutoController` implementado com rotas de listagem e cadastro, cobertas por testes;
 - telas de cadastro, consulta e edição ainda não foram criadas.
 
 Os percentuais servem apenas para acompanhar o desenvolvimento. Eles não representam aprovação regulatória nem validação para uso em produção.

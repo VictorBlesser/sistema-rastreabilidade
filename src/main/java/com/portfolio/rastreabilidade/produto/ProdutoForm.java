@@ -26,6 +26,10 @@ public class ProdutoForm {
     public ProdutoForm() {
     }
 
+    public Produto toProduto() {
+        return new Produto(codigo, nome, descricao, tipo, controlaLote, controlaValidade);
+    }
+
     public String getCodigo() {
         return codigo;
     }

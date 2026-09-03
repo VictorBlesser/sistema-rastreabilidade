@@ -1,6 +1,6 @@
 # Requisitos — Cadastro de Produtos
 
-## Estado da implementação em 2 de setembro de 2026
+## Estado da implementação em 3 de setembro de 2026
 
 | Item | Estado | Evidência atual |
 |---|---|---|
@@ -14,7 +14,8 @@
 | Normalização do código | Implementado e testado | Construtor de `Produto` e `deveNormalizarCodigoDoProduto` |
 | Validação dos campos obrigatórios | Implementado e testado | Construtor e testes de código, nome e tipo |
 | Objeto de entrada do formulário | Implementado | `ProdutoForm` com validações Jakarta |
-| Telas e rotas web de Produtos | Pendente | `ProdutoController` e templates ainda não existem |
+| Rotas web de listagem e cadastro | Implementado e testado | `ProdutoController` e `ProdutoControllerTest` |
+| Telas de listagem e cadastro | Pendente | Templates ainda não existem |
 | Consulta, edição e inativação pelo navegador | Pendente | Depende das rotas e telas |
 
 `Implementado` significa presente no código atual. Não significa que o módulo esteja validado ou liberado para produção.
@@ -140,6 +141,12 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 | `deveRecusarCodigoEmBranco` | REQ-PRO-003 |
 | `deveRecusarNomeEmBranco` | REQ-PRO-003 |
 | `deveRecusarTipoNulo` | REQ-PRO-003 |
+| `deveNormalizarNomeEDescricaoDoProduto` | Preservação e normalização dos dados opcionais do formulário |
+| `deveListarProdutos` | REQ-PRO-006 pela rota web |
+| `deveExibirFormularioDeCadastro` | REQ-PRO-001 pela rota web |
+| `deveCadastrarProdutoValido` | REQ-PRO-001 e REQ-PRO-011 pela rota web |
+| `deveRecusarFormularioInvalido` | REQ-PRO-003 pela rota web |
+| `deveExibirErroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 pela rota web |
 | `contextLoads` | A aplicação Spring inicia no perfil de testes e valida as migrações |
 
 ## 10. Referências do projeto

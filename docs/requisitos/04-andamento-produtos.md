@@ -2,7 +2,7 @@
 
 Este documento registra o avanço técnico do módulo. Ele complementa o histórico do Git, mas não substitui protocolos formais de validação, revisão da Qualidade ou evidências de uso em produção.
 
-## Situação consolidada em 2 de setembro de 2026
+## Situação consolidada em 3 de setembro de 2026
 
 | Componente | Situação |
 |---|---|
@@ -12,8 +12,10 @@ Este documento registra o avanço técnico do módulo. Ele complementa o histór
 | `ProdutoRepository` | Acesso JPA criado e consulta de existência por código adicionada |
 | `ProdutoService` | Cadastro com verificação de duplicidade e listagem por nome implementados |
 | `ProdutoForm` | Criado com campos, getters, setters e validações de entrada |
+| `ProdutoController` | Rotas de listagem, abertura do formulário e cadastro implementadas |
 | `ProdutoTest` | Criação como ativo, inativação, normalização e campos obrigatórios testados |
 | `ProdutoServiceTest` | Cadastro permitido, duplicidade recusada e listagem ordenada testados |
+| `ProdutoControllerTest` | Cinco cenários das rotas web testados com MockMvc |
 | Perfil de testes | Banco H2 em memória separado do banco de desenvolvimento |
 
 ## Evidências de desenvolvimento
@@ -26,10 +28,11 @@ Este documento registra o avanço técnico do módulo. Ele complementa o histór
 | 02/09/2026 | Normalização do código no construtor | RN-PRO-002 e REQ-PRO-011 | Teste `deveNormalizarCodigoDoProduto` |
 | 02/09/2026 | Validação de código, nome e tipo obrigatórios | REQ-PRO-003 | Testes `deveRecusarCodigoEmBranco`, `deveRecusarNomeEmBranco` e `deveRecusarTipoNulo` |
 | 02/09/2026 | Objeto de entrada para a futura tela | REQ-PRO-001 e REQ-PRO-003 | Classe `ProdutoForm` compilada com validações Jakarta |
+| 03/09/2026 | Controlador web de Produtos | REQ-PRO-001, REQ-PRO-003, REQ-PRO-006 e REQ-PRO-008 | Cinco testes de rotas, validação, cadastro e duplicidade |
 
 ## Próxima atividade
 
-Criar `ProdutoController`, responsável por receber as requisições web do módulo e encaminhá-las ao serviço.
+Criar os templates de listagem e cadastro utilizados por `ProdutoController`.
 
 Depois dessa regra, a sequência planejada é:
 
@@ -39,8 +42,8 @@ Depois dessa regra, a sequência planejada é:
 
 ## Indicadores de acompanhamento
 
-- projeto completo: 13% estimados;
-- módulo Produtos: 82% estimados;
-- testes existentes no código: dez.
+- projeto completo: 14% estimados;
+- módulo Produtos: 86% estimados;
+- testes existentes no código: dezesseis.
 
 Os percentuais são indicadores motivacionais de planejamento. A conclusão real será determinada pelos critérios de aceitação e pela revisão técnica.

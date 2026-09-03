@@ -17,9 +17,9 @@ Sistema interno de rastreabilidade e qualidade, construído em Java com Spring B
 - [x] Histórico de alterações do banco com Flyway
 - [x] Página inicial
 - [x] Estrutura inicial de segurança
-- [ ] Especificação do primeiro módulo
+- [x] Especificação do primeiro módulo
 - [ ] Usuários e permissões
-- [ ] Produtos e lotes
+- [ ] Produtos e lotes — controlador de Produtos concluído
 - [ ] Recebimento e estoque
 - [ ] Trilha de auditoria
 

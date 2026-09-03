@@ -50,6 +50,16 @@ public class Produto {
             TipoProduto tipo,
             boolean controlaLote,
             boolean controlaValidade) {
+        this(codigo, nome, null, tipo, controlaLote, controlaValidade);
+    }
+
+    public Produto(
+            String codigo,
+            String nome,
+            String descricao,
+            TipoProduto tipo,
+            boolean controlaLote,
+            boolean controlaValidade) {
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("O código é obrigatório");
         }
@@ -61,7 +71,8 @@ public class Produto {
         }
 
         this.codigo = codigo.trim().toUpperCase(Locale.ROOT);
-        this.nome = nome;
+        this.nome = nome.trim();
+        this.descricao = descricao == null || descricao.isBlank() ? null : descricao.trim();
         this.tipo = tipo;
         this.controlaLote = controlaLote;
         this.controlaValidade = controlaValidade;
@@ -78,6 +89,10 @@ public class Produto {
 
     public String getNome() {
         return nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
     }
 
     public TipoProduto getTipo() {

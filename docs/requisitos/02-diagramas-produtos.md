@@ -11,7 +11,8 @@ src/main/java/com/portfolio/rastreabilidade/
     ├── Produto.java
     ├── ProdutoRepository.java
     ├── ProdutoService.java
-    └── ProdutoForm.java
+    ├── ProdutoForm.java
+    └── ProdutoController.java
 
 src/main/resources/
 └── db/migration/
@@ -19,6 +20,7 @@ src/main/resources/
 
 src/test/java/com/portfolio/rastreabilidade/
 └── produto/
+    ├── ProdutoControllerTest.java
     ├── ProdutoTest.java
     └── ProdutoServiceTest.java
 ```
@@ -26,16 +28,10 @@ src/test/java/com/portfolio/rastreabilidade/
 ### Arquivos planejados para concluir o módulo
 
 ```text
-src/main/java/com/portfolio/rastreabilidade/produto/
-└── ProdutoController.java
-
 src/main/resources/templates/produtos/
 ├── lista.html
 ├── formulario.html
 └── detalhe.html
-
-src/test/java/com/portfolio/rastreabilidade/produto/
-└── ProdutoControllerTest.java
 ```
 
 ## 2. Diagrama de classes
@@ -88,11 +84,21 @@ classDiagram
         -boolean controlaValidade
     }
 
+    class ProdutoController {
+        -ProdutoService service
+        +listar(Model model) String
+        +novo(Model model) String
+        +cadastrar(ProdutoForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) String
+    }
+
     Produto --> TipoProduto : possui um tipo
     ProdutoRepository --> Produto : persiste
     ProdutoService --> ProdutoRepository : utiliza
     ProdutoService --> Produto : aplica regras
     ProdutoForm --> TipoProduto : recebe o tipo selecionado
+    ProdutoForm --> Produto : converte dados validados
+    ProdutoController --> ProdutoService : encaminha operacoes
+    ProdutoController --> ProdutoForm : recebe o formulario
 ```
 
 Este diagrama mostra somente o que já existe. `save` e `findAll` são herdados de `JpaRepository`; não precisam ser escritos novamente na interface.
@@ -111,7 +117,7 @@ flowchart LR
     E --> F[(Tabela produto)]
 ```
 
-O fluxo pelo navegador será acrescentado quando `ProdutoController` e as telas forem implementados.
+O controlador já recebe e valida as requisições. A apresentação completa no navegador será acrescentada na próxima etapa, com os templates de listagem e cadastro.
 
 ## 4. Diagrama de objetos
 

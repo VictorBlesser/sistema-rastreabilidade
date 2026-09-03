@@ -258,7 +258,7 @@ As etapas iniciais concluídas foram:
 5. Corrija os avisos antes de continuar.
 6. Avance para banco, repositório e serviço.
 
-O projeto já concluiu essa sequência. A etapa atual é normalizar e validar os dados antes de criar o formulário e o controlador web.
+O projeto já concluiu essa sequência, a validação do formulário e a criação do controlador web. A etapa atual é criar os templates de listagem e cadastro.
 
 Quando ocorrer um erro, leia primeiro a primeira mensagem que aponta para um arquivo do seu projeto. Anote o nome do arquivo, a linha e a mensagem; essas três informações normalmente são suficientes para investigar o problema.
 

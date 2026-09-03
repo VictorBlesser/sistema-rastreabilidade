@@ -47,6 +47,21 @@ class ProdutoTest {
     }
 
     @Test
+    void deveNormalizarNomeEDescricaoDoProduto() {
+        Produto produto = new Produto(
+                "CAT-001",
+                " Cateter ",
+                " Uso hospitalar ",
+                TipoProduto.PRODUTO_MEDICO,
+                true,
+                true
+        );
+
+        assertEquals("Cateter", produto.getNome());
+        assertEquals("Uso hospitalar", produto.getDescricao());
+    }
+
+    @Test
     void deveRecusarCodigoEmBranco() {
         IllegalArgumentException erro = assertThrows(
                 IllegalArgumentException.class,
