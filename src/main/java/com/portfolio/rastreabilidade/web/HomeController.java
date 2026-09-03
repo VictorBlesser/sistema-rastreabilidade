@@ -9,7 +9,7 @@ public class HomeController {
 
     @GetMapping("/")
     String home(Model model) {
-        model.addAttribute("etapaAtual", "Fundacao do sistema");
+        model.addAttribute("etapaAtual", "Cadastro e listagem de produtos");
         return "home";
     }
 }

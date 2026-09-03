@@ -12,6 +12,10 @@
     <h1>Rastreabilidade e qualidade</h1>
     <p class="intro">Este é um sistema demonstrativo de rastreabilidade.</p>
 
+    <div class="actions">
+        <a class="button" th:href="@{/produtos}">Acessar produtos</a>
+    </div>
+
     <section class="card">
         <span>Etapa atual</span>
         <strong th:text="${etapaAtual}">Fundação do sistema</strong>
@@ -21,7 +25,7 @@
         <h2>Próximos módulos</h2>
         <div class="grid">
             <article><b>01</b><span>Usuários e permissões</span></article>
-            <article><b>02</b><span>Produtos e lotes</span></article>
+            <article><b>02</b><span>Produtos e lotes — em desenvolvimento</span></article>
             <article><b>03</b><span>Recebimento e estoque</span></article>
             <article><b>04</b><span>Rastreabilidade e auditoria</span></article>
         </div>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Produtos | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="container">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+        <a th:href="@{/}">Início</a>
+        <span aria-hidden="true">/</span>
+        <span>Produtos</span>
+    </nav>
+
+    <div class="page-header">
+        <div>
+            <p class="tag">Módulo de produtos</p>
+            <h1>Produtos cadastrados</h1>
+            <p class="intro">Consulte os produtos e seus controles de lote e validade.</p>
+        </div>
+        <a class="button" th:href="@{/produtos/novo}">Cadastrar produto</a>
+    </div>
+
+    <div class="alert alert-success" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        Produto cadastrado com sucesso
+    </div>
+
+    <section class="panel" aria-labelledby="titulo-lista">
+        <h2 id="titulo-lista" class="visually-hidden">Lista de produtos</h2>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(produtos)}">
+            <strong>Nenhum produto cadastrado</strong>
+            <p>Comece registrando o primeiro produto do sistema.</p>
+            <a class="button button-secondary" th:href="@{/produtos/novo}">Cadastrar primeiro produto</a>
+        </div>
+
+        <div class="table-wrapper" th:unless="${#lists.isEmpty(produtos)}">
+            <table>
+                <thead>
+                <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Lote</th>
+                    <th scope="col">Validade</th>
+                    <th scope="col">Situação</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="produto : ${produtos}">
+                    <td class="code" th:text="${produto.codigo}">CAT-001</td>
+                    <td th:text="${produto.nome}">Cateter</td>
+                    <td th:text="${produto.tipo.rotulo}">Produto médico</td>
+                    <td th:text="${produto.controlaLote ? 'Sim' : 'Não'}">Sim</td>
+                    <td th:text="${produto.controlaValidade ? 'Sim' : 'Não'}">Sim</td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${produto.ativo} ? ' status-active' : ' status-inactive'"
+                              th:text="${produto.ativo ? 'Ativo' : 'Inativo'}">Ativo</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

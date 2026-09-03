@@ -16,6 +16,7 @@ Este documento registra o avanço técnico do módulo. Ele complementa o histór
 | `ProdutoTest` | Criação como ativo, inativação, normalização e campos obrigatórios testados |
 | `ProdutoServiceTest` | Cadastro permitido, duplicidade recusada e listagem ordenada testados |
 | `ProdutoControllerTest` | Cinco cenários das rotas web testados com MockMvc |
+| Templates de Produtos | Telas responsivas de listagem e cadastro criadas e renderizadas em testes de integração |
 | Perfil de testes | Banco H2 em memória separado do banco de desenvolvimento |
 
 ## Evidências de desenvolvimento
@@ -29,21 +30,22 @@ Este documento registra o avanço técnico do módulo. Ele complementa o histór
 | 02/09/2026 | Validação de código, nome e tipo obrigatórios | REQ-PRO-003 | Testes `deveRecusarCodigoEmBranco`, `deveRecusarNomeEmBranco` e `deveRecusarTipoNulo` |
 | 02/09/2026 | Objeto de entrada para a futura tela | REQ-PRO-001 e REQ-PRO-003 | Classe `ProdutoForm` compilada com validações Jakarta |
 | 03/09/2026 | Controlador web de Produtos | REQ-PRO-001, REQ-PRO-003, REQ-PRO-006 e REQ-PRO-008 | Cinco testes de rotas, validação, cadastro e duplicidade |
+| 03/09/2026 | Telas de listagem e cadastro de Produtos | REQ-PRO-001, REQ-PRO-003, REQ-PRO-004, REQ-PRO-005 e REQ-PRO-006 | Testes de integração renderizam lista e formulário com Thymeleaf |
 
 ## Próxima atividade
 
-Criar os templates de listagem e cadastro utilizados por `ProdutoController`.
+Implementar consulta de um produto pelo identificador.
 
 Depois dessa regra, a sequência planejada é:
 
-1. criar as telas de cadastro e listagem;
-2. implementar consulta, edição e inativação pela interface;
+1. implementar consulta de um produto;
+2. implementar edição e inativação pela interface;
 3. executar os testes completos e revisar a documentação antes do commit.
 
 ## Indicadores de acompanhamento
 
-- projeto completo: 14% estimados;
-- módulo Produtos: 86% estimados;
-- testes existentes no código: dezesseis.
+- projeto completo: 15% estimados;
+- módulo Produtos: 90% estimados;
+- testes existentes no código: dezoito.
 
 Os percentuais são indicadores motivacionais de planejamento. A conclusão real será determinada pelos critérios de aceitação e pela revisão técnica.

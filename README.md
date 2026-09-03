@@ -19,7 +19,7 @@ Sistema interno de rastreabilidade e qualidade, construído em Java com Spring B
 - [x] Estrutura inicial de segurança
 - [x] Especificação do primeiro módulo
 - [ ] Usuários e permissões
-- [ ] Produtos e lotes — controlador de Produtos concluído
+- [ ] Produtos e lotes — telas de cadastro e listagem concluídas
 - [ ] Recebimento e estoque
 - [ ] Trilha de auditoria
 

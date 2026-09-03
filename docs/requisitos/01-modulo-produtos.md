@@ -15,7 +15,7 @@
 | Validação dos campos obrigatórios | Implementado e testado | Construtor e testes de código, nome e tipo |
 | Objeto de entrada do formulário | Implementado | `ProdutoForm` com validações Jakarta |
 | Rotas web de listagem e cadastro | Implementado e testado | `ProdutoController` e `ProdutoControllerTest` |
-| Telas de listagem e cadastro | Pendente | Templates ainda não existem |
+| Telas de listagem e cadastro | Implementado e testado | Templates Thymeleaf e testes de integração de renderização |
 | Consulta, edição e inativação pelo navegador | Pendente | Depende das rotas e telas |
 
 `Implementado` significa presente no código atual. Não significa que o módulo esteja validado ou liberado para produção.
@@ -148,6 +148,8 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 | `deveRecusarFormularioInvalido` | REQ-PRO-003 pela rota web |
 | `deveExibirErroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 pela rota web |
 | `contextLoads` | A aplicação Spring inicia no perfil de testes e valida as migrações |
+| `deveRenderizarListaDeProdutos` | Templates exibem os dados e controles do produto |
+| `deveRenderizarFormularioDeProduto` | Formulário de cadastro é renderizado com os campos esperados |
 
 ## 10. Referências do projeto
 

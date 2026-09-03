@@ -87,6 +87,10 @@ public class Produto {
         return codigo;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getNome() {
         return nome;
     }
@@ -97,6 +101,14 @@ public class Produto {
 
     public TipoProduto getTipo() {
         return tipo;
+    }
+
+    public boolean isControlaLote() {
+        return controlaLote;
+    }
+
+    public boolean isControlaValidade() {
+        return controlaValidade;
     }
 
     public boolean isAtivo() {
