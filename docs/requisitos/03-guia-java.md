@@ -1,11 +1,11 @@
-# Guia rápido de Java para o Sistema JA
+# Guia rápido de Java para o Sistema de Rastreabilidade
 
 Este guia é uma lembrança de sintaxe. Os exemplos não foram adicionados às classes do sistema e podem ser adaptados durante a programação.
 
 ## 1. Estrutura básica de uma classe
 
 ```java
-package br.com.japrodutos.sistema.produto;
+package com.portfolio.rastreabilidade.produto;
 
 public class Produto {
 
@@ -69,7 +69,7 @@ import java.time.Instant;
 Um `enum` limita os valores possíveis:
 
 ```java
-package br.com.japrodutos.sistema.produto;
+package com.portfolio.rastreabilidade.produto;
 
 public enum TipoProduto {
     MEDICAMENTO,

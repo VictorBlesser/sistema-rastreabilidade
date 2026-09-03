@@ -5,7 +5,7 @@
 ### Arquivos existentes
 
 ```text
-src/main/java/br/com/japrodutos/sistema/
+src/main/java/com/portfolio/rastreabilidade/
 └── produto/
     ├── TipoProduto.java
     ├── Produto.java
@@ -17,7 +17,7 @@ src/main/resources/
 └── db/migration/
     └── V2__criar_tabela_produto.sql
 
-src/test/java/br/com/japrodutos/sistema/
+src/test/java/com/portfolio/rastreabilidade/
 └── produto/
     ├── ProdutoTest.java
     └── ProdutoServiceTest.java
@@ -26,7 +26,7 @@ src/test/java/br/com/japrodutos/sistema/
 ### Arquivos planejados para concluir o módulo
 
 ```text
-src/main/java/br/com/japrodutos/sistema/produto/
+src/main/java/com/portfolio/rastreabilidade/produto/
 └── ProdutoController.java
 
 src/main/resources/templates/produtos/
@@ -34,7 +34,7 @@ src/main/resources/templates/produtos/
 ├── formulario.html
 └── detalhe.html
 
-src/test/java/br/com/japrodutos/sistema/produto/
+src/test/java/com/portfolio/rastreabilidade/produto/
 └── ProdutoControllerTest.java
 ```
 

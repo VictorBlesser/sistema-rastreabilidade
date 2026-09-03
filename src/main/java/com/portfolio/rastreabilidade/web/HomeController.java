@@ -1,4 +1,4 @@
-package br.com.japrodutos.sistema.web;
+package com.portfolio.rastreabilidade.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,4 +1,4 @@
-# Documentação do Sistema JA
+# Documentação do Sistema de Rastreabilidade
 
 Esta pasta reúne a documentação funcional e técnica do projeto. Ela deve evoluir junto com o código.
 

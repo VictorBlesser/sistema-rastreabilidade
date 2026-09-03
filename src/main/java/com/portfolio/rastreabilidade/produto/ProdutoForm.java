@@ -1,4 +1,4 @@
-package br.com.japrodutos.sistema.produto;
+package com.portfolio.rastreabilidade.produto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

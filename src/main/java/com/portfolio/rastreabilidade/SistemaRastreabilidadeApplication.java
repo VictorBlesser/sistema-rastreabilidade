@@ -1,13 +1,13 @@
-package br.com.japrodutos.sistema;
+package com.portfolio.rastreabilidade;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SistemaJaApplication {
+public class SistemaRastreabilidadeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SistemaJaApplication.class, args);
+		SpringApplication.run(SistemaRastreabilidadeApplication.class, args);
 	}
 
 }

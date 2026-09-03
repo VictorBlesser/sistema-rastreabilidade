@@ -1,4 +1,4 @@
-# Sistema JA
+# Sistema de Rastreabilidade
 
 Sistema interno de rastreabilidade e qualidade, construído em Java com Spring Boot.
 

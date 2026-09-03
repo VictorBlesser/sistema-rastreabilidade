@@ -21,7 +21,7 @@
 
 ## 1. Objetivo
 
-Permitir o cadastro e a consulta dos produtos controlados pelo Sistema JA. O cadastro será a base para os módulos futuros de lotes, recebimento, estoque, expedição, devolução e rastreabilidade.
+Permitir o cadastro e a consulta dos produtos controlados pelo Sistema de Rastreabilidade. O cadastro será a base para os módulos futuros de lotes, recebimento, estoque, expedição, devolução e rastreabilidade.
 
 ## 2. Escopo da primeira versão
 

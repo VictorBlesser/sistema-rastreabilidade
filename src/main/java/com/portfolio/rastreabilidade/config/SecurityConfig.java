@@ -1,4 +1,4 @@
-package br.com.japrodutos.sistema.config;
+package com.portfolio.rastreabilidade.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

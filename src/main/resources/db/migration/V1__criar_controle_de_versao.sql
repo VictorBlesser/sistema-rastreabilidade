@@ -6,4 +6,4 @@ CREATE TABLE versao_sistema (
 );
 
 INSERT INTO versao_sistema (versao, descricao)
-VALUES ('0.1.0', 'Fundacao inicial do Sistema JA');
+VALUES ('0.1.0', 'Fundacao inicial do Sistema de Rastreabilidade');

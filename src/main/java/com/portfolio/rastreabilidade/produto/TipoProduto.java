@@ -1,4 +1,4 @@
-package br.com.japrodutos.sistema.produto;
+package com.portfolio.rastreabilidade.produto;
 
 public enum TipoProduto {
 MEDICAMENTO,

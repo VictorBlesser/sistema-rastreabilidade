@@ -8,10 +8,10 @@
 		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>br.com.japrodutos</groupId>
-	<artifactId>sistema-ja</artifactId>
+	<groupId>com.portfolio</groupId>
+	<artifactId>sistema-rastreabilidade</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Sistema JA</name>
+	<name>Sistema de Rastreabilidade</name>
 	<description>Sistema de rastreabilidade e qualidade</description>
 	<url/>
 	<licenses>
