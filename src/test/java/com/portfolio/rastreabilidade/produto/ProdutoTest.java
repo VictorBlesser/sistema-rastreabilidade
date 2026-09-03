@@ -16,8 +16,7 @@ class ProdutoTest {
                 "Cateter",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
-                true
-        );
+                true);
         assertTrue(produto.isAtivo());
     }
 
@@ -28,8 +27,7 @@ class ProdutoTest {
                 "Cateter",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
-                true
-        );
+                true);
         produto.inativar();
         assertFalse(produto.isAtivo());
     }
@@ -41,8 +39,7 @@ class ProdutoTest {
                 "Cateter",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
-                true
-        );
+                true);
         assertEquals("CAT-001", produto.getCodigo());
     }
 
@@ -54,8 +51,7 @@ class ProdutoTest {
                 " Uso hospitalar ",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
-                true
-        );
+                true);
 
         assertEquals("Cateter", produto.getNome());
         assertEquals("Uso hospitalar", produto.getDescricao());
@@ -70,9 +66,7 @@ class ProdutoTest {
                         "Cateter",
                         TipoProduto.PRODUTO_MEDICO,
                         true,
-                        true
-                )
-        );
+                        true));
         assertEquals("O código é obrigatório", erro.getMessage());
     }
 
@@ -85,11 +79,10 @@ class ProdutoTest {
                         " ",
                         TipoProduto.PRODUTO_MEDICO,
                         true,
-                        true
-                )
-        );
+                        true));
         assertEquals("O nome é obrigatório", erro.getMessage());
     }
+
     @Test
     void deveRecusarTipoNulo() {
         IllegalArgumentException erro = assertThrows(
@@ -99,9 +92,7 @@ class ProdutoTest {
                         "Cateter",
                         null,
                         true,
-                        true
-                )
-        );
+                        true));
         assertEquals("O tipo é obrigatório", erro.getMessage());
     }
 }

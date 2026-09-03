@@ -1,95 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cadastrar produto | Sistema de Rastreabilidade</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
+
 <body>
-<main class="container container-form">
-    <nav class="breadcrumb" aria-label="Navegação estrutural">
-        <a th:href="@{/}">Início</a>
-        <span aria-hidden="true">/</span>
-        <a th:href="@{/produtos}">Produtos</a>
-        <span aria-hidden="true">/</span>
-        <span>Novo</span>
-    </nav>
+    <main class="container container-form">
+        <nav class="breadcrumb" aria-label="Navegação estrutural">
+            <a th:href="@{/}">Início</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/produtos}">Produtos</a>
+            <span aria-hidden="true">/</span>
+            <span>Novo</span>
+        </nav>
 
-    <p class="tag">Módulo de produtos</p>
-    <h1>Cadastrar produto</h1>
-    <p class="intro">Os campos marcados com asterisco são obrigatórios.</p>
+        <p class="tag">Módulo de produtos</p>
+        <h1>Cadastrar produto</h1>
+        <p class="intro">Os campos marcados com asterisco são obrigatórios.</p>
 
-    <form class="form panel" th:action="@{/produtos}" th:object="${produtoForm}" method="post" novalidate>
-        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
-            Revise os campos destacados antes de continuar.
-        </div>
-
-        <div class="form-grid">
-            <div class="field">
-                <label for="codigo">Código *</label>
-                <input id="codigo" type="text" th:field="*{codigo}" maxlength="50" autocomplete="off"
-                       th:classappend="${#fields.hasErrors('codigo')} ? ' input-error'"
-                       aria-describedby="codigo-ajuda codigo-erro">
-                <small id="codigo-ajuda">Será salvo sem espaços nas extremidades e em letras maiúsculas.</small>
-                <span id="codigo-erro" class="field-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}">
-                    O código é obrigatório
-                </span>
+        <form class="form panel" th:action="@{/produtos}" th:object="${produtoForm}" method="post" novalidate>
+            <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+                Revise os campos destacados antes de continuar.
             </div>
 
-            <div class="field">
-                <label for="nome">Nome *</label>
-                <input id="nome" type="text" th:field="*{nome}" maxlength="150"
-                       th:classappend="${#fields.hasErrors('nome')} ? ' input-error'"
-                       aria-describedby="nome-erro">
-                <span id="nome-erro" class="field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
-                    O nome é obrigatório
-                </span>
-            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="codigo">Código *</label>
+                    <input id="codigo" type="text" th:field="*{codigo}" maxlength="50" autocomplete="off"
+                        th:classappend="${#fields.hasErrors('codigo')} ? ' input-error'"
+                        aria-describedby="codigo-ajuda codigo-erro">
+                    <small id="codigo-ajuda">Será salvo sem espaços nas extremidades e em letras maiúsculas.</small>
+                    <span id="codigo-erro" class="field-error" th:if="${#fields.hasErrors('codigo')}"
+                        th:errors="*{codigo}">
+                        O código é obrigatório
+                    </span>
+                </div>
 
-            <div class="field field-full">
-                <label for="tipo">Tipo *</label>
-                <select id="tipo" th:field="*{tipo}"
-                        th:classappend="${#fields.hasErrors('tipo')} ? ' input-error'"
+                <div class="field">
+                    <label for="nome">Nome *</label>
+                    <input id="nome" type="text" th:field="*{nome}" maxlength="150"
+                        th:classappend="${#fields.hasErrors('nome')} ? ' input-error'" aria-describedby="nome-erro">
+                    <span id="nome-erro" class="field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
+                        O nome é obrigatório
+                    </span>
+                </div>
+
+                <div class="field field-full">
+                    <label for="tipo">Tipo *</label>
+                    <select id="tipo" th:field="*{tipo}" th:classappend="${#fields.hasErrors('tipo')} ? ' input-error'"
                         aria-describedby="tipo-erro">
-                    <option value="">Selecione um tipo</option>
-                    <option th:each="tipoProduto : ${tiposProduto}"
-                            th:value="${tipoProduto}"
+                        <option value="">Selecione um tipo</option>
+                        <option th:each="tipoProduto : ${tiposProduto}" th:value="${tipoProduto}"
                             th:text="${tipoProduto.rotulo}">Produto médico</option>
-                </select>
-                <span id="tipo-erro" class="field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}">
-                    O tipo é obrigatório
-                </span>
+                    </select>
+                    <span id="tipo-erro" class="field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}">
+                        O tipo é obrigatório
+                    </span>
+                </div>
+
+                <div class="field field-full">
+                    <label for="descricao">Descrição</label>
+                    <textarea id="descricao" th:field="*{descricao}" maxlength="500" rows="4"
+                        th:classappend="${#fields.hasErrors('descricao')} ? ' input-error'"
+                        aria-describedby="descricao-erro"></textarea>
+                    <span id="descricao-erro" class="field-error" th:if="${#fields.hasErrors('descricao')}"
+                        th:errors="*{descricao}">
+                        A descrição deve ter no máximo 500 caracteres
+                    </span>
+                </div>
             </div>
 
-            <div class="field field-full">
-                <label for="descricao">Descrição</label>
-                <textarea id="descricao" th:field="*{descricao}" maxlength="500" rows="4"
-                          th:classappend="${#fields.hasErrors('descricao')} ? ' input-error'"
-                          aria-describedby="descricao-erro"></textarea>
-                <span id="descricao-erro" class="field-error" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}">
-                    A descrição deve ter no máximo 500 caracteres
-                </span>
+            <fieldset class="controls-group">
+                <legend>Controles obrigatórios</legend>
+                <label class="checkbox">
+                    <input type="checkbox" th:field="*{controlaLote}">
+                    <span>Exige controle de lote</span>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" th:field="*{controlaValidade}">
+                    <span>Exige controle de validade</span>
+                </label>
+            </fieldset>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/produtos}">Cancelar</a>
+                <button class="button" type="submit">Salvar produto</button>
             </div>
-        </div>
-
-        <fieldset class="controls-group">
-            <legend>Controles obrigatórios</legend>
-            <label class="checkbox">
-                <input type="checkbox" th:field="*{controlaLote}">
-                <span>Exige controle de lote</span>
-            </label>
-            <label class="checkbox">
-                <input type="checkbox" th:field="*{controlaValidade}">
-                <span>Exige controle de validade</span>
-            </label>
-        </fieldset>
-
-        <div class="form-actions">
-            <a class="button button-ghost" th:href="@{/produtos}">Cancelar</a>
-            <button class="button" type="submit">Salvar produto</button>
-        </div>
-    </form>
-</main>
+        </form>
+    </main>
 </body>
 </html>
