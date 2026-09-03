@@ -15,23 +15,18 @@ src/main/java/com/portfolio/rastreabilidade/
     └── ProdutoController.java
 
 src/main/resources/
-└── db/migration/
-    └── V2__criar_tabela_produto.sql
+├── db/migration/
+│   └── V2__criar_tabela_produto.sql
+└── templates/produtos/
+    ├── lista.html
+    ├── formulario.html
+    └── detalhe.html
 
 src/test/java/com/portfolio/rastreabilidade/
 └── produto/
     ├── ProdutoControllerTest.java
     ├── ProdutoTest.java
     └── ProdutoServiceTest.java
-```
-
-### Arquivos planejados para concluir o módulo
-
-```text
-src/main/resources/templates/produtos/
-├── lista.html
-├── formulario.html
-└── detalhe.html
 ```
 
 ## 2. Diagrama de classes
@@ -67,12 +62,15 @@ classDiagram
         +existsByCodigoIgnoreCase(String codigo) boolean
         +save(Produto produto) Produto
         +findAll(Sort ordenacao) List~Produto~
+        +findById(Long id) Optional~Produto~
     }
 
     class ProdutoService {
         -ProdutoRepository repository
         +cadastrar(Produto produto) Produto
         +listar() List~Produto~
+        +buscarPorId(Long id) Produto
+        +inativar(Long id) Produto
     }
 
     class ProdutoForm {
@@ -89,6 +87,8 @@ classDiagram
         +listar(Model model) String
         +novo(Model model) String
         +cadastrar(ProdutoForm form, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) String
+        +detalhar(Long id, Model model, RedirectAttributes redirectAttributes) String
+        +inativar(Long id, RedirectAttributes redirectAttributes) String
     }
 
     Produto --> TipoProduto : possui um tipo
@@ -117,9 +117,23 @@ flowchart LR
     E --> F[(Tabela produto)]
 ```
 
-O controlador já recebe e valida as requisições. A apresentação completa no navegador será acrescentada na próxima etapa, com os templates de listagem e cadastro.
+O controlador já recebe e valida as requisições de cadastro, listagem e consulta por identificador. Os templates de listagem, cadastro e detalhes já existem. A próxima etapa acrescentará edição e inativação pela interface.
 
-## 4. Diagrama de objetos
+## 4. Fluxo de inativação
+
+```mermaid
+flowchart LR
+    A[Usuário seleciona Inativar produto] --> B[POST /produtos/id/inativar]
+    B --> C[ProdutoController]
+    C --> D[ProdutoService]
+    D --> E[Produto.inativar]
+    E --> F[ProdutoRepository.save]
+    F --> G[(Produto permanece salvo com ativo igual a false)]
+```
+
+A inativação altera o estado do produto sem excluir seu registro, preservando a referência para o histórico futuro.
+
+## 5. Diagrama de objetos
 
 O diagrama de classes mostra os moldes. O diagrama de objetos mostra exemplos que existem durante a execução.
 
@@ -135,7 +149,7 @@ flowchart LR
     P -->|valor do campo tipo| T
 ```
 
-## 5. Diferença entre classe e objeto
+## 6. Diferença entre classe e objeto
 
 ```text
 Classe  = molde ou definição: Produto.java

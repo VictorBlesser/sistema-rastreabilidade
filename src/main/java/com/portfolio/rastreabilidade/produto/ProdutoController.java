@@ -1,5 +1,6 @@
 package com.portfolio.rastreabilidade.produto;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -59,7 +60,42 @@ public class ProdutoController {
         return "redirect:/produtos";
     }
 
+    @GetMapping("/{id}")
+    String detalhar(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        try {
+            model.addAttribute("produto", service.buscarPorId(id));
+            return "produtos/detalhe";
+        } catch (IllegalArgumentException erro) {
+            redirectAttributes.addFlashAttribute(
+                    "mensagemErro",
+                    erro.getMessage());
+            return "redirect:/produtos";
+        }
+    }
+
+    @PostMapping("/{id}/inativar")
+    String inativar(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            service.inativar(id);
+            redirectAttributes.addFlashAttribute(
+                    "mensagemSucesso",
+                    "Produto inativado com sucesso");
+            return "redirect:/produtos/" + id;
+        } catch (IllegalArgumentException erro) {
+            redirectAttributes.addFlashAttribute(
+                    "mensagemErro",
+                    erro.getMessage());
+            return "redirect:/produtos";
+        }
+    }
+
     private void adicionarTiposProduto(Model model) {
         model.addAttribute("tiposProduto", TipoProduto.values());
     }
+
 }

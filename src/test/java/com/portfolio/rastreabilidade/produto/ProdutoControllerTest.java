@@ -71,12 +71,12 @@ class ProdutoControllerTest {
         when(service.cadastrar(any(Produto.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         mockMvc.perform(post("/produtos")
-                        .param("codigo", " cat-001 ")
-                        .param("nome", " Cateter ")
-                        .param("descricao", " Uso hospitalar ")
-                        .param("tipo", "PRODUTO_MEDICO")
-                        .param("controlaLote", "true")
-                        .param("controlaValidade", "true"))
+                .param("codigo", " cat-001 ")
+                .param("nome", " Cateter ")
+                .param("descricao", " Uso hospitalar ")
+                .param("tipo", "PRODUTO_MEDICO")
+                .param("controlaLote", "true")
+                .param("controlaValidade", "true"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/produtos"))
                 .andExpect(flash().attribute("mensagemSucesso", "Produto cadastrado com sucesso"));
@@ -91,8 +91,8 @@ class ProdutoControllerTest {
     @Test
     void deveRecusarFormularioInvalido() throws Exception {
         mockMvc.perform(post("/produtos")
-                        .param("codigo", " ")
-                        .param("nome", " "))
+                .param("codigo", " ")
+                .param("nome", " "))
                 .andExpect(status().isOk())
                 .andExpect(view().name("produtos/formulario"))
                 .andExpect(model().attributeHasFieldErrors("produtoForm", "codigo", "nome", "tipo"))
@@ -107,9 +107,9 @@ class ProdutoControllerTest {
                 .thenThrow(new IllegalArgumentException("Código já cadastrado"));
 
         mockMvc.perform(post("/produtos")
-                        .param("codigo", "CAT-001")
-                        .param("nome", "Cateter")
-                        .param("tipo", "PRODUTO_MEDICO"))
+                .param("codigo", "CAT-001")
+                .param("nome", "Cateter")
+                .param("tipo", "PRODUTO_MEDICO"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("produtos/formulario"))
                 .andExpect(model().attributeHasFieldErrorCode(
@@ -117,6 +117,62 @@ class ProdutoControllerTest {
                         "codigo",
                         "produto.codigo.duplicado"))
                 .andExpect(model().attributeExists("tiposProduto"));
+    }
+
+    @Test
+    void deveExibirDetalhesDoProduto() throws Exception {
+        Produto produto = novoProduto();
+        when(service.buscarPorId(1L)).thenReturn(produto);
+
+        mockMvc.perform(get("/produtos/1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("produtos/detalhe"))
+                .andExpect(model().attribute("produto", produto));
+
+        verify(service).buscarPorId(1L);
+    }
+
+    @Test
+    void deveRedirecionarQuandoProdutoNaoExiste() throws Exception {
+        when(service.buscarPorId(99L))
+                .thenThrow(new IllegalArgumentException(
+                        "Produto não encontrado"));
+
+        mockMvc.perform(get("/produtos/99"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/produtos"))
+                .andExpect(flash().attribute(
+                        "mensagemErro",
+                        "Produto não encontrado"));
+    }
+
+    @Test
+    void deveInativarProduto() throws Exception {
+        Produto produto = novoProduto();
+        when(service.inativar(1L)).thenReturn(produto);
+
+        mockMvc.perform(post("/produtos/1/inativar"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/produtos/1"))
+                .andExpect(flash().attribute(
+                        "mensagemSucesso",
+                        "Produto inativado com sucesso"));
+
+        verify(service).inativar(1L);
+    }
+
+    @Test
+    void deveRedirecionarQuandoProdutoParaInativarNaoExiste() throws Exception {
+        when(service.inativar(99L))
+                .thenThrow(new IllegalArgumentException(
+                        "Produto não encontrado"));
+
+        mockMvc.perform(post("/produtos/99/inativar"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/produtos"))
+                .andExpect(flash().attribute(
+                        "mensagemErro",
+                        "Produto não encontrado"));
     }
 
     private Produto novoProduto() {

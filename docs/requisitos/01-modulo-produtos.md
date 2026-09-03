@@ -10,13 +10,19 @@
 | Cadastro pelo serviço | Implementado | `ProdutoService.cadastrar()` e teste unitário |
 | Recusa de código duplicado | Implementado e testado | `existsByCodigoIgnoreCase` e `deveRecusarCadastroQuandoCodigoJaExiste` |
 | Listagem por nome | Implementado e testado | `ProdutoService.listar()` e `deveListarProdutosOrdenadosPorNome` |
+| Consulta por identificador no serviço | Implementado e testado | `ProdutoService.buscarPorId()` e dois testes unitários |
 | Criação como ativo e inativação | Implementado e testado | Métodos e testes da entidade `Produto` |
+| Inativação pelo serviço | Implementado e testado | `ProdutoService.inativar()` e teste unitário |
+| Rota web de inativação | Implementado e testado | `ProdutoController.inativar()` e dois testes de controlador |
 | Normalização do código | Implementado e testado | Construtor de `Produto` e `deveNormalizarCodigoDoProduto` |
 | Validação dos campos obrigatórios | Implementado e testado | Construtor e testes de código, nome e tipo |
 | Objeto de entrada do formulário | Implementado | `ProdutoForm` com validações Jakarta |
 | Rotas web de listagem e cadastro | Implementado e testado | `ProdutoController` e `ProdutoControllerTest` |
+| Rota web de consulta por identificador | Implementado e testado | `ProdutoController.detalhar()` e dois testes de controlador |
 | Telas de listagem e cadastro | Implementado e testado | Templates Thymeleaf e testes de integração de renderização |
-| Consulta, edição e inativação pelo navegador | Pendente | Depende das rotas e telas |
+| Tela de consulta pelo navegador | Implementado e testado | Template `detalhe.html` e teste de integração |
+| Inativação pelo navegador | Implementado e testado | Serviço, rota, botão e teste integrado com banco H2 |
+| Edição pelo navegador | Evolução futura | Não faz parte do escopo da primeira versão |
 
 `Implementado` significa presente no código atual. Não significa que o módulo esteja validado ou liberado para produção.
 
@@ -134,9 +140,12 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 |---|---|
 | `deveCriarProdutoAtivo` | Novo produto inicia com `ativo = true` |
 | `deveInativarProduto` | RN-PRO-003 e REQ-PRO-009 |
+| `deveInativarProdutoPeloServico` | RN-PRO-003 e REQ-PRO-009 pela camada de serviço |
 | `deveCadastrarProdutoQuandoCodigoNaoExiste` | REQ-PRO-001 |
 | `deveRecusarCadastroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 |
 | `deveListarProdutosOrdenadosPorNome` | REQ-PRO-006 |
+| `deveBuscarProdutoPorId` | REQ-PRO-007 |
+| `deveInformarQuandoProdutoNaoExiste` | REQ-PRO-007 e cenário de identificador inexistente |
 | `deveNormalizarCodigoDoProduto` | RN-PRO-002 e REQ-PRO-011 |
 | `deveRecusarCodigoEmBranco` | REQ-PRO-003 |
 | `deveRecusarNomeEmBranco` | REQ-PRO-003 |
@@ -147,9 +156,15 @@ O `Controller` recebe a ação do navegador. O `Service` executa as regras de ne
 | `deveCadastrarProdutoValido` | REQ-PRO-001 e REQ-PRO-011 pela rota web |
 | `deveRecusarFormularioInvalido` | REQ-PRO-003 pela rota web |
 | `deveExibirErroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 pela rota web |
+| `deveExibirDetalhesDoProduto` | REQ-PRO-007 pela rota web |
+| `deveRedirecionarQuandoProdutoNaoExiste` | REQ-PRO-007 e tratamento de identificador inexistente pela rota web |
+| `deveInativarProduto` em `ProdutoControllerTest` | RN-PRO-003 e REQ-PRO-009 pela rota web |
+| `deveRedirecionarQuandoProdutoParaInativarNaoExiste` | Tratamento de identificador inexistente na inativação |
 | `contextLoads` | A aplicação Spring inicia no perfil de testes e valida as migrações |
 | `deveRenderizarListaDeProdutos` | Templates exibem os dados e controles do produto |
 | `deveRenderizarFormularioDeProduto` | Formulário de cadastro é renderizado com os campos esperados |
+| `deveRenderizarDetalhesDeProduto` | REQ-PRO-007 com rota, banco de testes e template Thymeleaf integrados |
+| `deveInativarProdutoPelaTela` | RN-PRO-003 e REQ-PRO-009 com controlador, serviço, repositório e banco integrados |
 
 ## 10. Referências do projeto
 

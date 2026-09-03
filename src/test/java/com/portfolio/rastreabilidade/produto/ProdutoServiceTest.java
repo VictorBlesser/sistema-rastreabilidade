@@ -1,6 +1,7 @@
 package com.portfolio.rastreabilidade.produto;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
@@ -88,5 +90,56 @@ public class ProdutoServiceTest {
 
         assertSame(produtos, resultado);
         verify(repository).findAll(ordenacao);
+    }
+
+    @Test
+    void deveBuscarProdutoPorId() {
+        Produto produto = new Produto(
+                "CAT-001",
+                "Cateter",
+                TipoProduto.PRODUTO_MEDICO,
+                true,
+                true
+        );
+
+        when(repository.findById(1L)).thenReturn(Optional.of(produto));
+        Produto resultado = service.buscarPorId(1L);
+
+        assertSame(produto, resultado);
+        verify(repository).findById(1L);
+    }
+
+    @Test
+    void deveInformarQuandoProdutoNaoExiste() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        IllegalArgumentException erro = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.buscarPorId(99L)
+        );
+
+        assertEquals("Produto não encontrado", erro.getMessage());
+    }
+
+    @Test
+    void deveInativarProdutoPeloServico() {
+        Produto produto = new Produto(
+                "CAT-001",
+                "Cateter",
+                TipoProduto.PRODUTO_MEDICO,
+                true,
+                true
+        );
+
+        when(repository.findById(1L)).thenReturn(Optional.of(produto));
+        when(repository.save(produto)).thenReturn(produto);
+
+        Produto resultado = service.inativar(1L);
+
+        assertSame(produto, resultado);
+        assertFalse(resultado.isAtivo());
+
+        verify(repository).findById(1L);
+        verify(repository).save(produto);
     }
 }

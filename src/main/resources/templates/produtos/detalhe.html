@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhes do produto | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="container container-form">
+    <nav class="breadcrumb" aria-label="Navegação estrutural">
+        <a th:href="@{/}">Início</a>
+        <span aria-hidden="true">/</span>
+        <a th:href="@{/produtos}">Produtos</a>
+        <span aria-hidden="true">/</span>
+        <span>Detalhes</span>
+    </nav>
+
+    <p class="tag">Módulo de produtos</p>
+    <h1 th:text="${produto.nome}">Nome do produto</h1>
+    <p class="intro">Informações cadastradas para este produto.</p>
+
+    <div class="alert alert-success"
+         role="status"
+         th:if="${mensagemSucesso}"
+         th:text="${mensagemSucesso}">
+        Produto inativado com sucesso
+    </div>
+
+    <section class="panel form" aria-label="Dados do produto">
+        <div class="form-grid">
+            <div class="field">
+                <span class="detail-label">Código</span>
+                <strong class="code" th:text="${produto.codigo}">
+                    CAT-001
+                </strong>
+            </div>
+
+            <div class="field">
+                <span class="detail-label">Tipo</span>
+                <strong th:text="${produto.tipo.rotulo}">
+                    Produto médico
+                </strong>
+            </div>
+
+            <div class="field field-full">
+                <span class="detail-label">Descrição</span>
+                <p class="detail-value detail-description"
+                   th:text="${produto.descricao != null ? produto.descricao : 'Não informada'}">
+                    Descrição do produto
+                </p>
+            </div>
+
+            <div class="field">
+                <span class="detail-label">Controle de lote</span>
+                <strong th:text="${produto.controlaLote ? 'Sim' : 'Não'}">
+                    Sim
+                </strong>
+            </div>
+
+            <div class="field">
+                <span class="detail-label">Controle de validade</span>
+                <strong th:text="${produto.controlaValidade ? 'Sim' : 'Não'}">
+                    Sim
+                </strong>
+            </div>
+
+            <div class="field field-full">
+                <span class="detail-label">Situação</span>
+                <div>
+                    <span class="status"
+                          th:classappend="${produto.ativo} ? ' status-active' : ' status-inactive'"
+                          th:text="${produto.ativo ? 'Ativo' : 'Inativo'}">
+                        Ativo
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/produtos}">
+                Voltar para produtos
+            </a>
+            <form th:if="${produto.ativo}"
+                  th:action="@{/produtos/{id}/inativar(id=${produto.id})}"
+                  method="post">
+                <button class="button" type="submit">
+                    Inativar produto
+                </button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

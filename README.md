@@ -2,6 +2,10 @@
 
 Sistema interno de rastreabilidade e qualidade, construído em Java com Spring Boot.
 
+## Requisito de desenvolvimento
+
+- JDK 25, conforme configurado no `pom.xml`.
+
 ## Executar no VS Code
 
 1. Abra esta pasta no VS Code.
@@ -19,7 +23,8 @@ Sistema interno de rastreabilidade e qualidade, construído em Java com Spring B
 - [x] Estrutura inicial de segurança
 - [x] Especificação do primeiro módulo
 - [ ] Usuários e permissões
-- [ ] Produtos e lotes — telas de cadastro e listagem concluídas
+- [x] Produtos — cadastro, listagem, consulta e inativação da primeira versão concluídos
+- [ ] Lotes e números de série
 - [ ] Recebimento e estoque
 - [ ] Trilha de auditoria
 

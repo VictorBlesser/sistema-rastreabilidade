@@ -27,4 +27,18 @@ public class ProdutoService {
     public List<Produto> listar() {
         return repository.findAll(Sort.by("nome"));
     }
+
+    @Transactional(readOnly = true)
+    public Produto buscarPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
+    }
+
+    @Transactional
+    public Produto inativar(Long id) {
+        Produto produto = buscarPorId(id);
+        produto.inativar();
+
+        return repository.save(produto);
+    }
 }
