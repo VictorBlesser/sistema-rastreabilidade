@@ -9,29 +9,99 @@
 </head>
 
 <body>
-    <main class="container">
-        <p class="tag">Projeto demonstrativo</p>
-        <h1>Rastreabilidade e qualidade</h1>
-        <p class="intro">Este é um sistema demonstrativo de rastreabilidade.</p>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+    <main class="container dashboard">
 
-        <div class="actions">
-            <a class="button" th:href="@{/produtos}">Acessar produtos</a>
+    <section class="dashboard-hero">
+        <div>
+            <p class="tag">Painel principal</p>
+            <h1>Visão geral do sistema</h1>
+            <p class="intro">
+                Acompanhe os módulos disponíveis e acesse as operações do sistema.
+            </p>
         </div>
 
-        <section class="card">
-            <span>Etapa atual</span>
-            <strong th:text="${etapaAtual}">Fundação do sistema</strong>
-        </section>
+        <a class="button" th:href="@{/produtos}">
+            Acessar produtos
+        </a>
+    </section>
 
-        <section>
-            <h2>Próximos módulos</h2>
-            <div class="grid">
-                <article><b>01</b><span>Usuários e permissões</span></article>
-                <article><b>02</b><span>Produtos e lotes — em desenvolvimento</span></article>
-                <article><b>03</b><span>Recebimento e estoque</span></article>
-                <article><b>04</b><span>Rastreabilidade e auditoria</span></article>
+    <section class="dashboard-summary" aria-label="Resumo do sistema">
+
+        <article class="summary-card summary-card-primary">
+            <span>Etapa atual</span>
+            <strong th:text="${etapaAtual}">
+                Cadastro e listagem de produtos
+            </strong>
+        </article>
+
+        <article class="summary-card">
+            <span>Módulo disponível</span>
+            <strong>Produtos</strong>
+            <small>Cadastro, consulta e inativação</small>
+        </article>
+
+        <article class="summary-card">
+            <span>Próxima etapa</span>
+            <strong>Usuários e permissões</strong>
+            <small>Planejado</small>
+        </article>
+
+    </section>
+
+    <section class="dashboard-section" aria-labelledby="titulo-modulos">
+
+        <div class="section-header">
+            <div>
+                <p class="tag">Áreas do sistema</p>
+                <h2 id="titulo-modulos">Módulos</h2>
             </div>
-        </section>
-    </main>
+        </div>
+
+        <div class="module-grid">
+
+            <a class="module-card module-card-available"
+               th:href="@{/produtos}">
+                <span class="module-badge">Disponível</span>
+                <h3>Produtos</h3>
+                <p>Cadastre, consulte e inative produtos.</p>
+                <strong>Abrir módulo</strong>
+            </a>
+
+            <article class="module-card">
+                <span class="module-badge">Planejado</span>
+                <h3>Lotes e validade</h3>
+                <p>Controle de lotes, séries e vencimentos.</p>
+            </article>
+
+            <article class="module-card">
+                <span class="module-badge">Planejado</span>
+                <h3>Recebimento</h3>
+                <p>Conferência, aprovação e quarentena.</p>
+            </article>
+
+            <article class="module-card">
+                <span class="module-badge">Planejado</span>
+                <h3>Estoque</h3>
+                <p>Saldos e movimentações de produtos.</p>
+            </article>
+
+            <article class="module-card">
+                <span class="module-badge">Planejado</span>
+                <h3>Expedição</h3>
+                <p>Separação, envio e rastreabilidade.</p>
+            </article>
+
+            <article class="module-card">
+                <span class="module-badge">Planejado</span>
+                <h3>Qualidade</h3>
+                <p>Auditoria, desvios e registros de controle.</p>
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
 </body>
 </html>

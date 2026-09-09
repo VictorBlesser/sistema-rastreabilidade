@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Sistema genérico</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body class="login-page">
+
+    <main class="login-shell">
+
+        <section class="login-card" aria-labelledby="titulo-login">
+
+            <header class="login-brand">
+                <p class="tag">Sistema genérico</p>
+                <h1 id="titulo-login">Acessar o sistema</h1>
+                <p>Informe suas credenciais para continuar.</p>
+            </header>
+
+            <div class="alert alert-danger"
+                 role="alert"
+                 th:if="${param.error}">
+                Usuário ou senha inválidos.
+            </div>
+
+            <div class="alert alert-success"
+                 role="status"
+                 th:if="${param.logout}">
+                Sessão encerrada com sucesso.
+            </div>
+
+            <form class="login-form"
+                  th:action="@{/login}"
+                  method="post">
+
+                <div class="field">
+                    <label for="username">Usuário</label>
+                    <input id="username"
+                           name="username"
+                           type="text"
+                           autocomplete="username"
+                           required
+                           autofocus>
+                </div>
+
+                <div class="field">
+                    <label for="password">Senha</label>
+                    <input id="password"
+                           name="password"
+                           type="password"
+                           autocomplete="current-password"
+                           required>
+                </div>
+
+                <button class="button login-button" type="submit">
+                    Entrar
+                </button>
+
+            </form>
+
+            <footer class="login-footer">
+                <p>Ambiente de desenvolvimento</p>
+            </footer>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" 
+xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+ <body>
+    <header class="topbar" th:fragment="barraSuperior">
+      <a class="topbar__brand" th:href="@{/}">
+    <strong>Sistema genérico</strong>
+        <span>Sistema de ERP</span>
+     </a>
+     
+     <nav class="topbar__modules" aria-label="Módulos do sistema">
+        <a th:href="@{/}">Início</a>
+        <a th:href="@{/produtos}">Produtos</a>
+        
+        <span title="Módulo futuro">Lotes</span>
+        <span title="Módulo futuro">Recebimento</span>
+        <span title="Módulo futuro">Estoque</span>
+        <span title="Módulo futuro">Expedição</span>
+        <span title="Módulo futuro">Qualidade</span>
+        <span title="Módulo futuro">Relatórios</span>
+    </nav>
+    <div class="topbar__user" sec:authorize="isAuthenticated()">
+        <span sec:authentication="name">Usuário</span>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Sair</button>
+        </form>
+    </div>
+    </header>
+ </body>
+</html>
