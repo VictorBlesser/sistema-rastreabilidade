@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cadastrar produto | Sistema de Rastreabilidade</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-
 <body>
     <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
     <main class="container container-form">
         <nav class="breadcrumb" aria-label="Navegação estrutural">
             <a th:href="@{/}">Início</a>
@@ -23,57 +22,98 @@
         <h1>Cadastrar produto</h1>
         <p class="intro">Os campos marcados com asterisco são obrigatórios.</p>
 
-        <form class="form panel" th:action="@{/produtos}" th:object="${produtoForm}" method="post" novalidate>
-            <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+        <form class="form panel" th:action="@{/produtos}"
+              th:object="${produtoForm}" method="post" novalidate>
+
+            <div class="alert alert-danger" role="alert"
+                 th:if="${#fields.hasAnyErrors()}">
                 Revise os campos destacados antes de continuar.
             </div>
 
             <div class="form-grid">
                 <div class="field">
                     <label for="codigo">Código *</label>
-                    <input id="codigo" type="text" th:field="*{codigo}" maxlength="50" autocomplete="off"
-                        th:classappend="${#fields.hasErrors('codigo')} ? ' input-error'"
-                        aria-describedby="codigo-ajuda codigo-erro">
-                    <small id="codigo-ajuda">Será salvo sem espaços nas extremidades e em letras maiúsculas.</small>
-                    <span id="codigo-erro" class="field-error" th:if="${#fields.hasErrors('codigo')}"
-                        th:errors="*{codigo}">
-                        O código é obrigatório
-                    </span>
+                    <input id="codigo" type="text" th:field="*{codigo}"
+                           maxlength="50" autocomplete="off" required
+                           th:classappend="${#fields.hasErrors('codigo')} ? ' input-error'"
+                           aria-describedby="codigo-ajuda codigo-erro">
+                    <small id="codigo-ajuda">
+                        Será salvo sem espaços nas extremidades e em letras maiúsculas.
+                    </small>
+                    <span id="codigo-erro" class="field-error"
+                          th:if="${#fields.hasErrors('codigo')}"
+                          th:errors="*{codigo}"></span>
                 </div>
 
                 <div class="field">
                     <label for="nome">Nome *</label>
-                    <input id="nome" type="text" th:field="*{nome}" maxlength="150"
-                        th:classappend="${#fields.hasErrors('nome')} ? ' input-error'" aria-describedby="nome-erro">
-                    <span id="nome-erro" class="field-error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}">
-                        O nome é obrigatório
-                    </span>
+                    <input id="nome" type="text" th:field="*{nome}"
+                           maxlength="150" required
+                           th:classappend="${#fields.hasErrors('nome')} ? ' input-error'"
+                           aria-describedby="nome-erro">
+                    <span id="nome-erro" class="field-error"
+                          th:if="${#fields.hasErrors('nome')}"
+                          th:errors="*{nome}"></span>
                 </div>
 
-                <div class="field field-full">
+                <div class="field">
                     <label for="tipo">Tipo *</label>
-                    <select id="tipo" th:field="*{tipo}" th:classappend="${#fields.hasErrors('tipo')} ? ' input-error'"
-                        aria-describedby="tipo-erro">
+                    <select id="tipo" th:field="*{tipo}" required
+                            th:classappend="${#fields.hasErrors('tipo')} ? ' input-error'"
+                            aria-describedby="tipo-erro">
                         <option value="">Selecione um tipo</option>
-                        <option th:each="tipoProduto : ${tiposProduto}" th:value="${tipoProduto}"
-                            th:text="${tipoProduto.rotulo}">Produto médico</option>
+                        <option th:each="tipoProduto : ${tiposProduto}"
+                                th:value="${tipoProduto}"
+                                th:text="${tipoProduto.rotulo}"></option>
                     </select>
-                    <span id="tipo-erro" class="field-error" th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}">
-                        O tipo é obrigatório
-                    </span>
+                    <span id="tipo-erro" class="field-error"
+                          th:if="${#fields.hasErrors('tipo')}"
+                          th:errors="*{tipo}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="unidadeMedida">Unidade de medida *</label>
+                    <select id="unidadeMedida" th:field="*{unidadeMedida}" required
+                            th:classappend="${#fields.hasErrors('unidadeMedida')} ? ' input-error'"
+                            aria-describedby="unidade-ajuda unidade-erro">
+                        <option value="">Selecione uma unidade</option>
+                        <option th:each="unidade : ${produtoForm.unidadesDisponiveis}"
+                                th:value="${unidade}"
+                                th:text="${unidade.name() + ' — ' + unidade.rotulo}">
+                        </option>
+                    </select>
+                    <small id="unidade-ajuda">
+                        Unidade utilizada para contar as entradas e saídas do estoque.
+                    </small>
+                    <span id="unidade-erro" class="field-error"
+                          th:if="${#fields.hasErrors('unidadeMedida')}"
+                          th:errors="*{unidadeMedida}"></span>
                 </div>
 
                 <div class="field field-full">
                     <label for="descricao">Descrição</label>
-                    <textarea id="descricao" th:field="*{descricao}" maxlength="500" rows="4"
-                        th:classappend="${#fields.hasErrors('descricao')} ? ' input-error'"
-                        aria-describedby="descricao-erro"></textarea>
-                    <span id="descricao-erro" class="field-error" th:if="${#fields.hasErrors('descricao')}"
-                        th:errors="*{descricao}">
-                        A descrição deve ter no máximo 500 caracteres
-                    </span>
+                    <textarea id="descricao" th:field="*{descricao}"
+                              maxlength="500" rows="4"
+                              th:classappend="${#fields.hasErrors('descricao')} ? ' input-error'"
+                              aria-describedby="descricao-erro"></textarea>
+                    <span id="descricao-erro" class="field-error"
+                          th:if="${#fields.hasErrors('descricao')}"
+                          th:errors="*{descricao}"></span>
                 </div>
             </div>
+
+            <fieldset class="controls-group">
+                <legend>Controle de quantidade</legend>
+                <label class="checkbox">
+                    <input type="checkbox" th:field="*{fracionavel}"
+                           aria-describedby="fracionavel-ajuda">
+                    <span>Permite quantidades fracionadas</span>
+                </label>
+                <p id="fracionavel-ajuda">
+                    Marque para aceitar valores como 1,5 ou 2,75.
+                    Desmarcado, o produto aceitará somente quantidades inteiras.
+                </p>
+            </fieldset>
 
             <fieldset class="controls-group">
                 <legend>Controles obrigatórios</legend>

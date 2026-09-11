@@ -76,10 +76,30 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario inativar(Long id) {
-        Usuario usuario = buscarPorId(id);
-        usuario.inativar();
+public Usuario inativar(Long id) {
+    Usuario usuario = buscarPorId(id);
 
-        return repository.save(usuario);
+    if (usuario.getPerfil() == PerfilUsuario.ADMINISTRADOR) {
+        throw new IllegalArgumentException(
+                "Usuários administradores não podem ser inativados");
     }
+
+    usuario.inativar();
+
+    return repository.save(usuario);
+}
+
+@Transactional
+public Usuario ativar(Long id) {
+    Usuario usuario = buscarPorId(id);
+
+    if (usuario.getPerfil() == PerfilUsuario.ADMINISTRADOR) {
+        throw new IllegalArgumentException(
+                "Usuários administradores não podem ser reativados por esta ação");
+    }
+
+    usuario.ativar();
+
+    return repository.save(usuario);
+}
 }

@@ -22,12 +22,28 @@ public class ProdutoForm {
 
     private boolean controlaLote;
     private boolean controlaValidade;
+    private boolean fracionavel;
+
+    @NotNull(message = "A unidade de medida é obrigatória")
+    private UnidadeMedida unidadeMedida = UnidadeMedida.UN;
 
     public ProdutoForm() {
     }
 
     public Produto toProduto() {
-        return new Produto(codigo, nome, descricao, tipo, controlaLote, controlaValidade);
+        return new Produto(
+                codigo,
+                nome,
+                descricao,
+                tipo,
+                controlaLote,
+                controlaValidade,
+                fracionavel,
+                unidadeMedida);
+    }
+
+    public UnidadeMedida[] getUnidadesDisponiveis() {
+        return UnidadeMedida.values();
     }
 
     public String getCodigo() {
@@ -76,5 +92,21 @@ public class ProdutoForm {
 
     public void setControlaValidade(boolean controlaValidade) {
         this.controlaValidade = controlaValidade;
+    }
+
+    public boolean isFracionavel() {
+        return fracionavel;
+    }
+
+    public void setFracionavel(boolean fracionavel) {
+        this.fracionavel = fracionavel;
+    }
+
+    public UnidadeMedida getUnidadeMedida() {
+        return unidadeMedida;
+    }
+
+    public void setUnidadeMedida(UnidadeMedida unidadeMedida) {
+        this.unidadeMedida = unidadeMedida;
     }
 }

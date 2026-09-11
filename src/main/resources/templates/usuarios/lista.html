@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuários | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container">
+        <nav class="breadcrumb" aria-label="Navegação estrutural">
+            <a th:href="@{/}">Início</a>
+            <span aria-hidden="true">/</span>
+            <span>Usuários</span>
+        </nav>
+
+        <div class="page-header">
+            <div>
+                <p class="tag">Módulo de usuários</p>
+                <h1>Usuários cadastrados</h1>
+                <p class="intro">Consulte os usuários, seus perfis e sua situação.</p>
+            </div>
+            <a class="button" th:href="@{/usuarios/novo}">Cadastrar usuário</a>
+        </div>
+
+        <div class="alert alert-success" role="status"
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+
+        <div class="alert alert-danger" role="alert"
+             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+
+        <section class="panel" aria-label="Lista de usuários">
+            <div class="empty-state" th:if="${#lists.isEmpty(usuarios)}">
+                <strong>Nenhum usuário cadastrado</strong>
+                <p>Cadastre o primeiro usuário do sistema.</p>
+                <a class="button button-secondary" th:href="@{/usuarios/novo}">
+                    Cadastrar primeiro usuário
+                </a>
+            </div>
+
+            <div class="table-wrapper" th:unless="${#lists.isEmpty(usuarios)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Login</th>
+                            <th scope="col">Perfil</th>
+                            <th scope="col">Situação</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="usuario : ${usuarios}">
+                            <td th:text="${usuario.nome}"></td>
+                            <td th:text="${usuario.login}"></td>
+                            <td th:text="${#strings.replace(usuario.perfil.name(), '_', ' ')}"></td>
+                            <td>
+                                <span class="status"
+                                      th:classappend="${usuario.ativo} ? ' status-active' : ' status-inactive'"
+                                      th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}"></span>
+                            </td>
+                            <td>
+                                <a class="button button-ghost"
+                                   th:href="@{/usuarios/{id}(id=${usuario.id})}">
+                                    Ver detalhes
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhes do usuário | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container container-form">
+        <nav class="breadcrumb" aria-label="Navegação estrutural">
+            <a th:href="@{/}">Início</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/usuarios}">Usuários</a>
+            <span aria-hidden="true">/</span>
+            <span>Detalhes</span>
+        </nav>
+
+        <p class="tag">Módulo de usuários</p>
+        <h1 th:text="${usuario.nome}">Detalhes do usuário</h1>
+
+        <section class="panel form" aria-label="Dados do usuário">
+            <div class="alert alert-success" role="status"
+                 th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <span class="detail-label">Login</span>
+                    <strong th:text="${usuario.login}"></strong>
+                </div>
+
+                <div class="field">
+                    <span class="detail-label">Perfil</span>
+                    <strong th:text="${#strings.replace(usuario.perfil.name(), '_', ' ')}"></strong>
+                </div>
+
+                <div class="field field-full">
+                    <span class="detail-label">Situação</span>
+                    <div>
+                        <span class="status"
+                              th:classappend="${usuario.ativo} ? ' status-active' : ' status-inactive'"
+                              th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+    <a class="button button-ghost" th:href="@{/usuarios}">
+        Voltar para usuários
+    </a>
+
+    <form th:if="${usuario.perfil.name() != 'ADMINISTRADOR' and usuario.ativo}"
+          th:action="@{/usuarios/{id}/inativar(id=${usuario.id})}"
+          method="post">
+        <button class="button" type="submit">
+            Inativar usuário
+        </button>
+    </form>
+
+    <form th:if="${usuario.perfil.name() != 'ADMINISTRADOR' and !usuario.ativo}"
+          th:action="@{/usuarios/{id}/ativar(id=${usuario.id})}"
+          method="post">
+        <button class="button" type="submit">
+            Ativar usuário
+        </button>
+    </form>
+</div>
+        </section>
+    </main>
+</body>
+</html>

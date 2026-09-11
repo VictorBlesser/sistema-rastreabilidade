@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhes do lote | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container container-form">
+        <nav class="breadcrumb" aria-label="Navegação estrutural">
+            <a th:href="@{/}">Início</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/lotes}">Lotes</a>
+            <span aria-hidden="true">/</span>
+            <span>Detalhes</span>
+        </nav>
+
+        <p class="tag">Módulo de lotes</p>
+        <h1 th:text="${'Lote ' + lote.numero}">Detalhes do lote</h1>
+
+        <section class="panel form" aria-label="Dados do lote">
+            <div class="form-grid">
+                <div class="field field-full">
+                    <span class="detail-label">Produto</span>
+                    <a th:href="@{/produtos/{id}(id=${lote.produto.id})}"
+                       th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}"></a>
+                </div>
+
+                <div class="field">
+                    <span class="detail-label">Fabricação</span>
+                    <strong th:text="${lote.dataFabricacao != null
+                        ? #temporals.format(lote.dataFabricacao, 'dd/MM/yyyy')
+                        : 'Não informada'}"></strong>
+                </div>
+
+                <div class="field">
+                    <span class="detail-label">Validade</span>
+                    <strong th:text="${lote.dataValidade != null
+                        ? #temporals.format(lote.dataValidade, 'dd/MM/yyyy')
+                        : 'Não informada'}"></strong>
+                </div>
+
+                <div class="field">
+                    <span class="detail-label">Situação cadastral</span>
+                    <span class="status"
+                          th:classappend="${lote.ativo} ? ' status-active' : ' status-inactive'"
+                          th:text="${lote.ativo ? 'Ativo' : 'Inativo'}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/lotes}">
+                    Voltar para lotes
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

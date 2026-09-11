@@ -17,6 +17,8 @@ public class SecurityConfig {
                                 "/css/**",
                                 "/actuator/health")
                         .permitAll()
+                        .requestMatchers("/usuarios", "/usuarios/**")
+                        .hasRole("ADMINISTRADOR")
                         .anyRequest()
                         .authenticated())
                 .formLogin(form -> form

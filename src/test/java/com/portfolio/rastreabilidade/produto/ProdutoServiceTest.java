@@ -10,8 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
@@ -21,125 +21,116 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ProdutoServiceTest {
 
-    @Mock
-    private ProdutoRepository repository;
+        @Mock
+        private ProdutoRepository repository;
 
-    @InjectMocks
-    private ProdutoService service;
+        @InjectMocks
+        private ProdutoService service;
 
-    @Test
-    void deveCadastrarProdutoQuandoCodigoNaoExiste() {
-        Produto produto = new Produto(
-                "CAT-001",
-                "Cateter",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
+        @Test
+        void deveCadastrarProdutoQuandoCodigoNaoExiste() {
+                Produto produto = new Produto(
+                                "CAT-001",
+                                "Cateter",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
 
-        when(repository.existsByCodigoIgnoreCase("CAT-001")).thenReturn(false);
-        when(repository.save(produto)).thenReturn(produto);
+                when(repository.existsByCodigoIgnoreCase("CAT-001")).thenReturn(false);
+                when(repository.save(produto)).thenReturn(produto);
 
-        Produto resultado = service.cadastrar(produto);
-        assertSame(produto, resultado);
-        verify(repository).save(produto);
-    }
+                Produto resultado = service.cadastrar(produto);
+                assertSame(produto, resultado);
+                verify(repository).save(produto);
+        }
 
-    @Test
-    void deveRecusarCadastroQuandoCodigoJaExiste() {
-        Produto produto = new Produto(
-                "CAT-001",
-                "Cateter",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
+        @Test
+        void deveRecusarCadastroQuandoCodigoJaExiste() {
+                Produto produto = new Produto(
+                                "CAT-001",
+                                "Cateter",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
 
-        when(repository.existsByCodigoIgnoreCase("CAT-001")).thenReturn(true);
-        IllegalArgumentException erro = assertThrows(
-                IllegalArgumentException.class,
-                () -> service.cadastrar(produto)
-        );
+                when(repository.existsByCodigoIgnoreCase("CAT-001")).thenReturn(true);
+                IllegalArgumentException erro = assertThrows(
+                                IllegalArgumentException.class,
+                                () -> service.cadastrar(produto));
 
-        assertEquals("Código já cadastrado", erro.getMessage());
-        verify(repository, never()).save(produto);
-    }
+                assertEquals("Código já cadastrado", erro.getMessage());
+                verify(repository, never()).save(produto);
+        }
 
-    @Test
-    void deveListarProdutosOrdenadosPorNome() {
-        Produto produto1 = new Produto(
-                "CAT-001",
-                "Cateter",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
-        Produto produto2 = new Produto(
-                "LUV-001",
-                "Luva cirúrgica",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
-        List<Produto> produtos = List.of(produto1, produto2);
-        Sort ordenacao = Sort.by("nome");
+        @Test
+        void deveListarProdutosOrdenadosPorNome() {
+                Produto produto1 = new Produto(
+                                "CAT-001",
+                                "Cateter",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
+                Produto produto2 = new Produto(
+                                "LUV-001",
+                                "Luva cirúrgica",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
+                List<Produto> produtos = List.of(produto1, produto2);
+                Sort ordenacao = Sort.by("nome");
 
-        when(repository.findAll(ordenacao)).thenReturn(produtos);
+                when(repository.findAll(ordenacao)).thenReturn(produtos);
 
-        List<Produto> resultado = service.listar();
+                List<Produto> resultado = service.listar();
 
-        assertSame(produtos, resultado);
-        verify(repository).findAll(ordenacao);
-    }
+                assertSame(produtos, resultado);
+                verify(repository).findAll(ordenacao);
+        }
 
-    @Test
-    void deveBuscarProdutoPorId() {
-        Produto produto = new Produto(
-                "CAT-001",
-                "Cateter",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
+        @Test
+        void deveBuscarProdutoPorId() {
+                Produto produto = new Produto(
+                                "CAT-001",
+                                "Cateter",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
+                when(repository.findById(1L)).thenReturn(Optional.of(produto));
+                Produto resultado = service.buscarPorId(1L);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(produto));
-        Produto resultado = service.buscarPorId(1L);
+                assertSame(produto, resultado);
+                verify(repository).findById(1L);
+        }
 
-        assertSame(produto, resultado);
-        verify(repository).findById(1L);
-    }
+        @Test
+        void deveInformarQuandoProdutoNaoExiste() {
+                when(repository.findById(99L)).thenReturn(Optional.empty());
 
-    @Test
-    void deveInformarQuandoProdutoNaoExiste() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+                IllegalArgumentException erro = assertThrows(
+                                IllegalArgumentException.class,
+                                () -> service.buscarPorId(99L));
 
-        IllegalArgumentException erro = assertThrows(
-                IllegalArgumentException.class,
-                () -> service.buscarPorId(99L)
-        );
+                assertEquals("Produto não encontrado", erro.getMessage());
+        }
 
-        assertEquals("Produto não encontrado", erro.getMessage());
-    }
+        @Test
+        void deveInativarProdutoPeloServico() {
+                Produto produto = new Produto(
+                                "CAT-001",
+                                "Cateter",
+                                TipoProduto.PRODUTO_MEDICO,
+                                true,
+                                true);
 
-    @Test
-    void deveInativarProdutoPeloServico() {
-        Produto produto = new Produto(
-                "CAT-001",
-                "Cateter",
-                TipoProduto.PRODUTO_MEDICO,
-                true,
-                true
-        );
+                when(repository.findById(1L)).thenReturn(Optional.of(produto));
+                when(repository.save(produto)).thenReturn(produto);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(produto));
-        when(repository.save(produto)).thenReturn(produto);
+                Produto resultado = service.inativar(1L);
 
-        Produto resultado = service.inativar(1L);
+                assertSame(produto, resultado);
+                assertFalse(resultado.isAtivo());
 
-        assertSame(produto, resultado);
-        assertFalse(resultado.isAtivo());
-
-        verify(repository).findById(1L);
-        verify(repository).save(produto);
-    }
+                verify(repository).findById(1L);
+                verify(repository).save(produto);
+        }
 }

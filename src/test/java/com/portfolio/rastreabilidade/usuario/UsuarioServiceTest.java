@@ -220,10 +220,10 @@ class UsuarioServiceTest {
     @Test
     void deveInativarUsuario() {
         Usuario usuario = new Usuario(
-                "Administrador",
-                "admin",
+                "Usuário de consulta",
+                "consulta-teste",
                 "hash-da-senha",
-                PerfilUsuario.ADMINISTRADOR);
+                PerfilUsuario.CONSULTA);
 
         when(repository.findById(1L)).thenReturn(Optional.of(usuario));
         when(repository.save(usuario)).thenReturn(usuario);

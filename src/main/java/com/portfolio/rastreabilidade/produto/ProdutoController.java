@@ -80,16 +80,20 @@ public class ProdutoController {
     String inativar(
             @PathVariable Long id,
             RedirectAttributes redirectAttributes) {
+
         try {
             service.inativar(id);
+
             redirectAttributes.addFlashAttribute(
                     "mensagemSucesso",
                     "Produto inativado com sucesso");
+
             return "redirect:/produtos/" + id;
         } catch (IllegalArgumentException erro) {
             redirectAttributes.addFlashAttribute(
                     "mensagemErro",
                     erro.getMessage());
+
             return "redirect:/produtos";
         }
     }

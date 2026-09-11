@@ -30,7 +30,7 @@ class UsuarioRepositoryTest {
     void deveSalvarEBuscarUsuarioPorLogin() {
         Usuario usuario = new Usuario(
                 "Administrador",
-                "admin",
+                "admin-teste",
                 "hash-da-senha",
                 PerfilUsuario.ADMINISTRADOR);
 
@@ -41,11 +41,11 @@ class UsuarioRepositoryTest {
 
         entityManager.clear();
 
-        Usuario encontrado = repository.findByLogin("admin").orElseThrow();
+        Usuario encontrado = repository.findByLogin("admin-teste").orElseThrow();
 
         assertEquals(id, encontrado.getId());
         assertEquals("Administrador", encontrado.getNome());
-        assertEquals("admin", encontrado.getLogin());
+        assertEquals("admin-teste", encontrado.getLogin());
         assertEquals("hash-da-senha", encontrado.getSenhaHash());
         assertEquals(PerfilUsuario.ADMINISTRADOR, encontrado.getPerfil());
         assertTrue(encontrado.isAtivo());
@@ -60,11 +60,11 @@ class UsuarioRepositoryTest {
     void deveIdentificarLoginExistente() {
         repository.saveAndFlush(new Usuario(
                 "Administrador",
-                "admin",
+                "admin-teste",
                 "hash-da-senha",
                 PerfilUsuario.ADMINISTRADOR));
 
-        assertTrue(repository.existsByLogin("admin"));
+        assertTrue(repository.existsByLogin("admin-teste"));
     }
 
     @Test
@@ -76,13 +76,13 @@ class UsuarioRepositoryTest {
     void deveRejeitarLoginDuplicado() {
         repository.saveAndFlush(new Usuario(
                 "Administrador",
-                "admin",
+                "admin-teste",
                 "hash-da-senha",
                 PerfilUsuario.ADMINISTRADOR));
 
         Usuario duplicado = new Usuario(
                 "Outro usuário",
-                "admin",
+                "admin-teste",
                 "outro-hash",
                 PerfilUsuario.CONSULTA);
 
@@ -95,7 +95,7 @@ class UsuarioRepositoryTest {
     void devePersistirInativacaoDoUsuario() {
         Usuario usuario = repository.saveAndFlush(new Usuario(
                 "Administrador",
-                "admin",
+                "admin-teste",
                 "hash-da-senha",
                 PerfilUsuario.ADMINISTRADOR));
 

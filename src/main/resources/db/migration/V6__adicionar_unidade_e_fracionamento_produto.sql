@@ -1,0 +1,5 @@
+ALTER TABLE produto
+    ADD COLUMN fracionavel BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE produto
+    ADD COLUMN unidade_medida VARCHAR(10) NOT NULL DEFAULT 'UN';

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastrar lote | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container container-form">
+        <nav class="breadcrumb" aria-label="Navegação estrutural">
+            <a th:href="@{/}">Início</a>
+            <span aria-hidden="true">/</span>
+            <a th:href="@{/lotes}">Lotes</a>
+            <span aria-hidden="true">/</span>
+            <span>Novo</span>
+        </nav>
+
+        <p class="tag">Módulo de lotes</p>
+        <h1>Cadastrar lote</h1>
+
+        <div class="empty-state panel" th:if="${#lists.isEmpty(produtos)}">
+            <strong>Nenhum produto disponível</strong>
+            <p>Cadastre um produto ativo com controle de lote habilitado.</p>
+            <a class="button" th:href="@{/produtos/novo}">Cadastrar produto</a>
+        </div>
+
+        <form class="form panel" th:unless="${#lists.isEmpty(produtos)}"
+              th:action="@{/lotes}" th:object="${loteForm}"
+              method="post" novalidate>
+
+            <div class="alert alert-danger" role="alert"
+                 th:if="${#fields.hasAnyErrors()}">
+                <p>Revise os dados antes de continuar.</p>
+                <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+            </div>
+
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="produtoId">Produto *</label>
+                    <select id="produtoId" th:field="*{produtoId}" required
+                            aria-describedby="produto-erro">
+                        <option value="">Selecione um produto</option>
+                        <option th:each="produto : ${produtos}"
+                                th:value="${produto.id}"
+                                th:text="${produto.codigo + ' — ' + produto.nome
+                                    + (produto.controlaValidade ? ' (exige validade)' : '')}">
+                        </option>
+                    </select>
+                    <span id="produto-erro" class="field-error"
+                          th:if="${#fields.hasErrors('produtoId')}"
+                          th:errors="*{produtoId}"></span>
+                </div>
+
+                <div class="field field-full">
+                    <label for="numero">Número do lote *</label>
+                    <input id="numero" type="text" th:field="*{numero}"
+                           maxlength="100" required autocomplete="off"
+                           aria-describedby="numero-ajuda numero-erro">
+                    <small id="numero-ajuda">
+                        Será salvo em letras maiúsculas e sem espaços nas extremidades.
+                    </small>
+                    <span id="numero-erro" class="field-error"
+                          th:if="${#fields.hasErrors('numero')}"
+                          th:errors="*{numero}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="dataFabricacao">Data de fabricação</label>
+                    <input id="dataFabricacao" type="date"
+                           th:field="*{dataFabricacao}"
+                           aria-describedby="fabricacao-erro">
+                    <span id="fabricacao-erro" class="field-error"
+                          th:if="${#fields.hasErrors('dataFabricacao')}"
+                          th:errors="*{dataFabricacao}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="dataValidade">Data de validade</label>
+                    <input id="dataValidade" type="date"
+                           th:field="*{dataValidade}"
+                           aria-describedby="validade-ajuda validade-erro">
+                    <small id="validade-ajuda">
+                        Obrigatória quando o produto exige controle de validade.
+                    </small>
+                    <span id="validade-erro" class="field-error"
+                          th:if="${#fields.hasErrors('dataValidade')}"
+                          th:errors="*{dataValidade}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/lotes}">Cancelar</a>
+                <button class="button" type="submit">Salvar lote</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
