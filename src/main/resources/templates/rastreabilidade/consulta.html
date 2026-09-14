@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rastreabilidade | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container">
+        <p class="tag">Rastreabilidade</p>
+        <h1>Histórico por lote</h1>
+        <p class="intro">
+            Consulte a origem, as saídas e o saldo registrado para cada lote.
+        </p>
+
+        <form class="panel form" th:action="@{/rastreabilidade}" method="get">
+            <div class="field">
+                <label for="loteId">Produto e lote</label>
+                <select id="loteId" name="loteId" required>
+                    <option value="">Selecione um lote</option>
+                    <option th:each="opcao : ${lotes}"
+                            th:value="${opcao.id}"
+                            th:selected="${opcao.id == loteSelecionadoId}"
+                            th:text="${opcao.produto.codigo + ' — '
+                                + opcao.produto.nome + ' — Lote ' + opcao.numero}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button class="button" type="submit">Consultar histórico</button>
+            </div>
+        </form>
+
+        <div class="alert alert-danger" role="alert"
+             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+
+        <div th:if="${lote != null}">
+            <section class="panel form" aria-label="Resumo do lote">
+                <h2 th:text="${'Lote ' + lote.numero}"></h2>
+
+                <div class="form-grid">
+                    <div class="field field-full">
+                        <span class="detail-label">Produto</span>
+                        <a th:href="@{/produtos/{id}(id=${lote.produto.id})}"
+                           th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}">
+                        </a>
+                    </div>
+
+                    <div class="field">
+                        <span class="detail-label">Validade</span>
+                        <strong th:text="${lote.dataValidade != null
+                            ? #temporals.format(lote.dataValidade, 'dd/MM/yyyy')
+                            : 'Não informada'}"></strong>
+                    </div>
+
+                    <div class="field">
+                        <span class="detail-label">Unidade</span>
+                        <strong th:text="${lote.produto.unidadeMedida.name()}"></strong>
+                    </div>
+
+                    <div class="field">
+                        <span class="detail-label">Total de entradas</span>
+                        <strong th:text="${#numbers.formatDecimal(
+                            entradas, 1, 'POINT', 6, 'COMMA')}"></strong>
+                    </div>
+
+                    <div class="field">
+                        <span class="detail-label">Total de saídas</span>
+                        <strong th:text="${#numbers.formatDecimal(
+                            saidas, 1, 'POINT', 6, 'COMMA')}"></strong>
+                    </div>
+
+                    <div class="field">
+                        <span class="detail-label">Saldo registrado</span>
+                        <strong th:text="${#numbers.formatDecimal(
+                            saldo, 1, 'POINT', 6, 'COMMA')}"></strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel form" aria-labelledby="titulo-historico">
+                <h2 id="titulo-historico">Movimentações confirmadas</h2>
+                <p>Rascunhos não aparecem neste histórico.</p>
+
+                <p th:if="${#lists.isEmpty(movimentos)}">
+                    Este lote ainda não possui movimentações confirmadas.
+                </p>
+
+                <div class="table-wrapper"
+                     th:unless="${#lists.isEmpty(movimentos)}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Registro</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Documento</th>
+                                <th scope="col">Fornecedor / destinatário</th>
+                                <th scope="col">Quantidade</th>
+                                <th scope="col">Responsável</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="movimento : ${movimentos}">
+                                <td th:text="${#temporals.format(
+                                    movimento.registradoEm, 'dd/MM/yyyy HH:mm:ss XXX')}">
+                                </td>
+                                <td th:text="${movimento.tipo.name() == 'ENTRADA'
+                                    ? 'Entrada' : 'Saída'}"></td>
+                                <td>
+                                    <a th:if="${movimento.recebimentoId != null}"
+                                       th:href="@{/recebimentos/{id}(id=${movimento.recebimentoId})}"
+                                       th:text="${movimento.documento}"></a>
+
+                                    <a th:if="${movimento.expedicaoId != null}"
+                                       th:href="@{/expedicoes/{id}(id=${movimento.expedicaoId})}"
+                                       th:text="${movimento.documento}"></a>
+                                </td>
+                                <td th:text="${movimento.participante}"></td>
+                                <td th:text="${#numbers.formatDecimal(
+                                    movimento.quantidade, 1, 'POINT', 6, 'COMMA')}">
+                                </td>
+                                <td th:text="${movimento.responsavel}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

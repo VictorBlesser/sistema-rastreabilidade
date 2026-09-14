@@ -16,17 +16,16 @@
                 Usuários
             </a>
             <a th:href="@{/lotes}">Lotes</a>
-
-            <span title="Módulo futuro">Recebimento</span>
-            <span title="Módulo futuro">Estoque</span>
-            <span title="Módulo futuro">Expedição</span>
+            <a th:href="@{/recebimentos}">Recebimento</a>
+            <a th:href="@{/estoque}">Estoque</a>
+            <a th:href="@{/expedicoes}">Expedição</a>
+            <a th:href="@{/rastreabilidade}">Rastreabilidade</a>
             <span title="Módulo futuro">Qualidade</span>
             <span title="Módulo futuro">Relatórios</span>
         </nav>
 
         <div class="topbar__user" sec:authorize="isAuthenticated()">
             <span sec:authentication="name">Usuário</span>
-
             <form th:action="@{/logout}" method="post">
                 <button type="submit">Sair</button>
             </form>

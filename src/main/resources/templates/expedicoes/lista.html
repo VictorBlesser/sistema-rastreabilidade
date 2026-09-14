@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Expedições | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <p class="tag">Expedição</p>
+                <h1>Expedições cadastradas</h1>
+                <p class="intro">Prepare os itens e confirme as saídas do estoque.</p>
+            </div>
+            <a class="button" th:href="@{/expedicoes/novo}">Nova expedição</a>
+        </div>
+
+        <div class="alert alert-success" role="status"
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+        <div class="alert alert-danger" role="alert"
+             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+
+        <section class="panel" aria-label="Lista de expedições">
+            <div class="empty-state" th:if="${#lists.isEmpty(expedicoes)}">
+                <strong>Nenhuma expedição cadastrada</strong>
+                <p>Comece criando um rascunho.</p>
+            </div>
+
+            <div class="table-wrapper" th:unless="${#lists.isEmpty(expedicoes)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Documento</th>
+                            <th scope="col">Destinatário</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Situação</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="expedicao : ${expedicoes}">
+                            <td th:text="${expedicao.documento}"></td>
+                            <td th:text="${expedicao.destinatario}"></td>
+                            <td th:text="${#temporals.format(
+                                expedicao.dataExpedicao, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${expedicao.rascunho
+                                ? 'Rascunho' : 'Confirmado'}"></td>
+                            <td>
+                                <a class="button button-ghost"
+                                   th:href="@{/expedicoes/{id}(id=${expedicao.id})}">
+                                    Ver detalhes
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

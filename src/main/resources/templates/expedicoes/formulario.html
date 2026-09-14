@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nova expedição | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container container-form">
+        <p class="tag">Expedição</p>
+        <h1>Nova expedição</h1>
+        <p class="intro">Crie o rascunho e depois adicione os produtos.</p>
+
+        <form class="form panel" th:action="@{/expedicoes}"
+              th:object="${expedicaoForm}" method="post" novalidate>
+
+            <div class="alert alert-danger" role="alert"
+                 th:if="${#fields.hasAnyErrors()}">
+                <p>Revise os dados informados.</p>
+                <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+            </div>
+
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="destinatario">Destinatário *</label>
+                    <input id="destinatario" th:field="*{destinatario}"
+                           maxlength="150" required
+                           aria-describedby="destinatario-erro">
+                    <span id="destinatario-erro" class="field-error"
+                          th:errors="*{destinatario}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="documento">Documento de saída *</label>
+                    <input id="documento" th:field="*{documento}"
+                           maxlength="100" required
+                           aria-describedby="documento-erro">
+                    <span id="documento-erro" class="field-error"
+                          th:errors="*{documento}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="dataExpedicao">Data da expedição *</label>
+                    <input id="dataExpedicao" type="date"
+                           th:field="*{dataExpedicao}" required
+                           aria-describedby="data-erro">
+                    <span id="data-erro" class="field-error"
+                          th:errors="*{dataExpedicao}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/expedicoes}">Cancelar</a>
+                <button class="button" type="submit">Criar rascunho</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

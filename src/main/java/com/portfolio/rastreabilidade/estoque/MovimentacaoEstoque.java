@@ -3,6 +3,9 @@ package com.portfolio.rastreabilidade.estoque;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import com.portfolio.rastreabilidade.expedicao.Expedicao;
+import com.portfolio.rastreabilidade.expedicao.ExpedicaoItem;
+import com.portfolio.rastreabilidade.expedicao.StatusExpedicao;
 import com.portfolio.rastreabilidade.lote.Lote;
 import com.portfolio.rastreabilidade.produto.Produto;
 import com.portfolio.rastreabilidade.recebimento.Recebimento;
@@ -30,13 +33,19 @@ public class MovimentacaoEstoque {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "recebimento_item_id",
-            nullable = false,
             unique = true,
             updatable = false)
     private RecebimentoItem recebimentoItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "expedicao_item_id",
+            unique = true,
+            updatable = false)
+    private ExpedicaoItem expedicaoItem;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "produto_id", nullable = false, updatable = false)
@@ -76,13 +85,9 @@ public class MovimentacaoEstoque {
                     "O recebimento precisa estar confirmado");
         }
 
-        if (recebimento.getConfirmadoPor() == null
-                || recebimento.getConfirmadoPor().getId() == null
-                || recebimento.getConfirmadoEm() == null) {
-
-            throw new IllegalArgumentException(
-                    "Os dados da confirmação são obrigatórios");
-        }
+        validarConfirmacao(
+                recebimento.getConfirmadoPor(),
+                recebimento.getConfirmadoEm());
 
         this.recebimentoItem = item;
         this.produto = item.getProduto();
@@ -93,12 +98,58 @@ public class MovimentacaoEstoque {
         this.registradoPor = recebimento.getConfirmadoPor();
     }
 
+    public static MovimentacaoEstoque saida(ExpedicaoItem item) {
+        if (item == null || item.getId() == null) {
+            throw new IllegalArgumentException(
+                    "O item precisa estar salvo antes de gerar a movimentação");
+        }
+
+        Expedicao expedicao = item.getExpedicao();
+
+        if (expedicao.getStatus() != StatusExpedicao.CONFIRMADO) {
+            throw new IllegalArgumentException(
+                    "A expedição precisa estar confirmada");
+        }
+
+        validarConfirmacao(
+                expedicao.getConfirmadoPor(),
+                expedicao.getConfirmadoEm());
+
+        MovimentacaoEstoque movimentacao = new MovimentacaoEstoque();
+
+        movimentacao.expedicaoItem = item;
+        movimentacao.produto = item.getProduto();
+        movimentacao.lote = item.getLote();
+        movimentacao.quantidade = item.getQuantidade();
+        movimentacao.tipo = TipoMovimentacao.SAIDA;
+        movimentacao.registradoEm = expedicao.getConfirmadoEm();
+        movimentacao.registradoPor = expedicao.getConfirmadoPor();
+
+        return movimentacao;
+    }
+
+    private static void validarConfirmacao(
+            Usuario usuario,
+            OffsetDateTime confirmadoEm) {
+
+        if (usuario == null
+                || usuario.getId() == null
+                || confirmadoEm == null) {
+            throw new IllegalArgumentException(
+                    "Os dados da confirmação são obrigatórios");
+        }
+    }
+
     public Long getId() {
         return id;
     }
 
     public RecebimentoItem getRecebimentoItem() {
         return recebimentoItem;
+    }
+
+    public ExpedicaoItem getExpedicaoItem() {
+        return expedicaoItem;
     }
 
     public Produto getProduto() {

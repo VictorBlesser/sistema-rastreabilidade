@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Novo recebimento | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container container-form">
+        <p class="tag">Recebimento</p>
+        <h1>Novo recebimento</h1>
+        <p class="intro">Crie o rascunho e depois adicione os produtos.</p>
+
+        <form class="form panel" th:action="@{/recebimentos}"
+              th:object="${recebimentoForm}" method="post" novalidate>
+
+            <div class="alert alert-danger" role="alert"
+                 th:if="${#fields.hasAnyErrors()}">
+                <p>Revise os dados informados.</p>
+                <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+            </div>
+
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="fornecedor">Fornecedor *</label>
+                    <input id="fornecedor" th:field="*{fornecedor}"
+                           maxlength="150" required aria-describedby="fornecedor-erro">
+                    <span id="fornecedor-erro" class="field-error"
+                          th:errors="*{fornecedor}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="documento">Documento de origem *</label>
+                    <input id="documento" th:field="*{documento}"
+                           maxlength="100" required aria-describedby="documento-erro">
+                    <span id="documento-erro" class="field-error"
+                          th:errors="*{documento}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="dataRecebimento">Data do recebimento *</label>
+                    <input id="dataRecebimento" type="date"
+                           th:field="*{dataRecebimento}" required
+                           aria-describedby="data-erro">
+                    <span id="data-erro" class="field-error"
+                          th:errors="*{dataRecebimento}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/recebimentos}">Cancelar</a>
+                <button class="button" type="submit">Criar rascunho</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

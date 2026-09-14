@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalhes do recebimento | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container">
+        <p class="tag">Recebimento</p>
+        <h1 th:text="${'Documento ' + recebimento.documento}"></h1>
+
+        <div class="alert alert-success" role="status"
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+        <div class="alert alert-danger" role="alert"
+             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+
+        <section class="panel form" aria-label="Dados do recebimento">
+            <div class="form-grid">
+                <div class="field">
+                    <span class="detail-label">Fornecedor</span>
+                    <strong th:text="${recebimento.fornecedor}"></strong>
+                </div>
+                <div class="field">
+                    <span class="detail-label">Data</span>
+                    <strong th:text="${#temporals.format(
+                        recebimento.dataRecebimento, 'dd/MM/yyyy')}"></strong>
+                </div>
+                <div class="field">
+                    <span class="detail-label">Situação</span>
+                    <strong th:text="${recebimento.rascunho
+                        ? 'Rascunho' : 'Confirmado'}"></strong>
+                </div>
+                <div class="field" th:unless="${recebimento.rascunho}">
+                    <span class="detail-label">Confirmado por</span>
+                    <strong th:text="${recebimento.confirmadoPor.nome}"></strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel form" aria-labelledby="titulo-itens">
+            <h2 id="titulo-itens">Itens do recebimento</h2>
+
+            <p th:if="${#lists.isEmpty(recebimento.itens)}">
+                Nenhum item adicionado.
+            </p>
+
+            <div class="table-wrapper"
+                 th:unless="${#lists.isEmpty(recebimento.itens)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Lote</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Unidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${recebimento.itens}">
+                            <td th:text="${item.produto.codigo + ' — ' + item.produto.nome}"></td>
+                            <td th:text="${item.lote != null ? item.lote.numero : 'Sem lote'}"></td>
+                            <td th:text="${#numbers.formatDecimal(
+                                item.quantidade, 1, 'POINT', 6, 'COMMA')}"></td>
+                            <td th:text="${item.produto.unidadeMedida.name()}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section th:if="${recebimento.rascunho}">
+            <form class="form panel" method="post" novalidate
+                  th:action="@{/recebimentos/{id}/itens(id=${recebimento.id})}"
+                  th:object="${itemForm}">
+                <h2>Adicionar item</h2>
+
+                <div class="alert alert-danger" role="alert"
+                     th:if="${#fields.hasAnyErrors()}">
+                    <p>Revise os dados do item.</p>
+                    <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="field field-full">
+                        <label for="produtoId">Produto *</label>
+                        <select id="produtoId" th:field="*{produtoId}" required
+                                aria-describedby="produto-erro">
+                            <option value="">Selecione um produto</option>
+                            <option th:each="produto : ${produtos}"
+                                    th:value="${produto.id}"
+                                    th:text="${produto.codigo + ' — ' + produto.nome
+                                        + ' (' + produto.unidadeMedida.name() + ')'
+                                        + (produto.fracionavel ? ' — Fracionável' : ' — Inteiro')
+                                        + (produto.controlaLote ? ' — Exige lote' : '')}">
+                            </option>
+                        </select>
+                        <span id="produto-erro" class="field-error"
+                              th:errors="*{produtoId}"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="loteId">Lote</label>
+                        <select id="loteId" th:field="*{loteId}"
+                                aria-describedby="lote-ajuda lote-erro">
+                            <option value="">Sem lote</option>
+                            <option th:each="lote : ${lotes}"
+                                    th:value="${lote.id}"
+                                    th:text="${lote.produto.codigo + ' — '
+                                        + lote.produto.nome + ' — Lote ' + lote.numero}">
+                            </option>
+                        </select>
+                        <small id="lote-ajuda">
+                            Selecione um lote do produto escolhido.
+                            Obrigatório para produtos com controle de lote.
+                        </small>
+                        <span id="lote-erro" class="field-error"
+                              th:errors="*{loteId}"></span>
+                    </div>
+
+                    <div class="field">
+                        <label for="quantidade">Quantidade *</label>
+                        <input id="quantidade" type="number"
+                               th:field="*{quantidade}" min="0.000001"
+                               step="0.000001" required
+                               aria-describedby="quantidade-ajuda quantidade-erro">
+                        <small id="quantidade-ajuda">
+                            Informe na unidade do produto.
+                            Produtos não fracionáveis aceitam apenas números inteiros.
+                        </small>
+                        <span id="quantidade-erro" class="field-error"
+                              th:errors="*{quantidade}"></span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="button" type="submit">Adicionar item</button>
+                </div>
+            </form>
+
+            <form class="panel form" method="post"
+                  th:if="${!#lists.isEmpty(recebimento.itens)}"
+                  th:action="@{/recebimentos/{id}/confirmar(id=${recebimento.id})}">
+                <h2>Confirmar recebimento</h2>
+                <p>
+                    Confira os itens. A confirmação registra as entradas no estoque
+                    e encerra a inclusão de itens neste recebimento.
+                </p>
+                <button class="button" type="submit">Confirmar entrada no estoque</button>
+            </form>
+        </section>
+
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/recebimentos}">
+                Voltar para recebimentos
+            </a>
+        </div>
+    </main>
+</body>
+</html>

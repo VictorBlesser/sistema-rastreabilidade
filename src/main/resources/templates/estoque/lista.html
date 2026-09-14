@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estoque | Sistema de Rastreabilidade</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+    <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <p class="tag">Estoque</p>
+                <h1>Estoque por produto e lote</h1>
+                <p class="intro">
+                    Quantidades calculadas a partir das movimentações registradas.
+                    Recebimentos em rascunho não alteram o saldo.
+                </p>
+            </div>
+            <a class="button" th:href="@{/recebimentos/novo}">
+                Novo recebimento
+            </a>
+        </div>
+
+        <section class="panel" aria-label="Saldos de estoque">
+            <div class="empty-state" th:if="${#lists.isEmpty(saldos)}">
+                <strong>Nenhuma movimentação registrada</strong>
+                <p>Confirme um recebimento para registrar a primeira entrada.</p>
+            </div>
+
+            <div class="table-wrapper" th:unless="${#lists.isEmpty(saldos)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Código</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Lote</th>
+                            <th scope="col">Validade</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Unidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="saldo : ${saldos}">
+                            <td class="code" th:text="${saldo.codigo}"></td>
+                            <td>
+                                <a th:href="@{/produtos/{id}(id=${saldo.produtoId})}"
+                                   th:text="${saldo.nome}"></a>
+                            </td>
+                            <td>
+                                <a th:if="${saldo.loteId != null}"
+                                   th:href="@{/lotes/{id}(id=${saldo.loteId})}"
+                                   th:text="${saldo.numeroLote}"></a>
+                                <span th:if="${saldo.loteId == null}">Sem lote</span>
+                            </td>
+                            <td th:text="${saldo.dataValidade != null
+                                ? #temporals.format(saldo.dataValidade, 'dd/MM/yyyy')
+                                : 'Não informada'}"></td>
+                            <td th:text="${#numbers.formatDecimal(
+                                saldo.quantidade, 1, 'POINT', 6, 'COMMA')}"></td>
+                            <td th:text="${saldo.unidadeMedida.name()}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
