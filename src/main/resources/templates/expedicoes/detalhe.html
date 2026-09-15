@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,9 +16,12 @@
         <h1 th:text="${'Documento ' + expedicao.documento}"></h1>
 
         <div class="alert alert-success" role="status"
-             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        </div>
+
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <section class="panel form" aria-label="Dados da expedição">
             <div class="form-grid">
@@ -24,16 +29,21 @@
                     <span class="detail-label">Destinatário</span>
                     <strong th:text="${expedicao.destinatario}"></strong>
                 </div>
+
                 <div class="field">
                     <span class="detail-label">Data</span>
                     <strong th:text="${#temporals.format(
-                        expedicao.dataExpedicao, 'dd/MM/yyyy')}"></strong>
+                        expedicao.dataExpedicao, 'dd/MM/yyyy')}">
+                    </strong>
                 </div>
+
                 <div class="field">
                     <span class="detail-label">Situação</span>
                     <strong th:text="${expedicao.rascunho
-                        ? 'Rascunho' : 'Confirmado'}"></strong>
+                        ? 'Rascunho' : 'Confirmado'}">
+                    </strong>
                 </div>
+
                 <div class="field" th:unless="${expedicao.rascunho}">
                     <span class="detail-label">Confirmado por</span>
                     <strong th:text="${expedicao.confirmadoPor.nome}"></strong>
@@ -64,7 +74,8 @@
                             <td th:text="${item.produto.codigo + ' — ' + item.produto.nome}"></td>
                             <td th:text="${item.lote != null ? item.lote.numero : 'Sem lote'}"></td>
                             <td th:text="${#numbers.formatDecimal(
-                                item.quantidade, 1, 'POINT', 6, 'COMMA')}"></td>
+                                item.quantidade, 1, 'POINT', 6, 'COMMA')}">
+                            </td>
                             <td th:text="${item.produto.unidadeMedida.name()}"></td>
                         </tr>
                     </tbody>
@@ -74,6 +85,7 @@
 
         <section th:if="${expedicao.rascunho}">
             <form class="form panel" method="post" novalidate
+                  sec:authorize="hasAuthority('EXPEDICAO_EDITAR')"
                   th:action="@{/expedicoes/{id}/itens(id=${expedicao.id})}"
                   th:object="${itemForm}">
                 <h2>Adicionar item</h2>
@@ -81,7 +93,9 @@
                 <div class="alert alert-danger" role="alert"
                      th:if="${#fields.hasAnyErrors()}">
                     <p>Revise os dados do item.</p>
-                    <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+                    <p th:each="erro : ${#fields.globalErrors()}"
+                       th:text="${erro}">
+                    </p>
                 </div>
 
                 <div class="form-grid">
@@ -99,7 +113,8 @@
                             </option>
                         </select>
                         <span id="produto-erro" class="field-error"
-                              th:errors="*{produtoId}"></span>
+                              th:errors="*{produtoId}">
+                        </span>
                     </div>
 
                     <div class="field">
@@ -118,7 +133,8 @@
                             Lotes vencidos na data da expedição não aparecem.
                         </small>
                         <span id="lote-erro" class="field-error"
-                              th:errors="*{loteId}"></span>
+                              th:errors="*{loteId}">
+                        </span>
                     </div>
 
                     <div class="field">
@@ -132,19 +148,24 @@
                             Produtos não fracionáveis aceitam apenas números inteiros.
                         </small>
                         <span id="quantidade-erro" class="field-error"
-                              th:errors="*{quantidade}"></span>
+                              th:errors="*{quantidade}">
+                        </span>
                     </div>
                 </div>
 
                 <div class="form-actions">
                     <button class="button" type="submit">Adicionar item</button>
-                    <a class="button button-ghost" th:href="@{/estoque}">
+
+                    <a class="button button-ghost"
+                       sec:authorize="hasAuthority('ESTOQUE_QUANTIDADE_FISICA_VISUALIZAR')"
+                       th:href="@{/estoque}">
                         Consultar estoque
                     </a>
                 </div>
             </form>
 
             <form class="panel form" method="post"
+                  sec:authorize="hasAuthority('EXPEDICAO_CONFIRMAR')"
                   th:if="${!#lists.isEmpty(expedicao.itens)}"
                   th:action="@{/expedicoes/{id}/confirmar(id=${expedicao.id})}">
                 <h2>Confirmar expedição</h2>
@@ -153,7 +174,9 @@
                     registra as saídas e encerra a inclusão de itens.
                     O rascunho não reserva estoque.
                 </p>
-                <button class="button" type="submit">Confirmar saída do estoque</button>
+                <button class="button" type="submit">
+                    Confirmar saída do estoque
+                </button>
             </form>
         </section>
 

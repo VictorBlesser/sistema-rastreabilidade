@@ -23,7 +23,8 @@
 
         <section class="panel form" aria-label="Dados do usuário">
             <div class="alert alert-success" role="status"
-                 th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+                 th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+            </div>
 
             <div class="form-grid">
                 <div class="field">
@@ -41,32 +42,29 @@
                     <div>
                         <span class="status"
                               th:classappend="${usuario.ativo} ? ' status-active' : ' status-inactive'"
-                              th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}"></span>
+                              th:text="${usuario.ativo ? 'Ativo' : 'Inativo'}">
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="form-actions">
-    <a class="button button-ghost" th:href="@{/usuarios}">
-        Voltar para usuários
-    </a>
+                <a class="button button-ghost" th:href="@{/usuarios}">
+                    Voltar para usuários
+                </a>
 
-    <form th:if="${usuario.perfil.name() != 'ADMINISTRADOR' and usuario.ativo}"
-          th:action="@{/usuarios/{id}/inativar(id=${usuario.id})}"
-          method="post">
-        <button class="button" type="submit">
-            Inativar usuário
-        </button>
-    </form>
+                <form th:if="${podeAlterarStatus and usuario.ativo}"
+                      th:action="@{/usuarios/{id}/inativar(id=${usuario.id})}"
+                      method="post">
+                    <button class="button" type="submit">Inativar usuário</button>
+                </form>
 
-    <form th:if="${usuario.perfil.name() != 'ADMINISTRADOR' and !usuario.ativo}"
-          th:action="@{/usuarios/{id}/ativar(id=${usuario.id})}"
-          method="post">
-        <button class="button" type="submit">
-            Ativar usuário
-        </button>
-    </form>
-</div>
+                <form th:if="${podeAlterarStatus and !usuario.ativo}"
+                      th:action="@{/usuarios/{id}/ativar(id=${usuario.id})}"
+                      method="post">
+                    <button class="button" type="submit">Ativar usuário</button>
+                </form>
+            </div>
         </section>
     </main>
 </body>

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,7 +15,7 @@
         <p class="tag">Rastreabilidade</p>
         <h1>Histórico por lote</h1>
         <p class="intro">
-            Consulte a origem, as saídas e o saldo registrado para cada lote.
+            Consulte a origem e o destino das movimentações de cada lote.
         </p>
 
         <form class="panel form" th:action="@{/rastreabilidade}" method="get">
@@ -36,7 +38,8 @@
         </form>
 
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <div th:if="${lote != null}">
             <section class="panel form" aria-label="Resumo do lote">
@@ -45,16 +48,23 @@
                 <div class="form-grid">
                     <div class="field field-full">
                         <span class="detail-label">Produto</span>
-                        <a th:href="@{/produtos/{id}(id=${lote.produto.id})}"
+
+                        <a sec:authorize="hasAuthority('PRODUTO_VISUALIZAR')"
+                           th:href="@{/produtos/{id}(id=${lote.produto.id})}"
                            th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}">
                         </a>
+
+                        <strong sec:authorize="!hasAuthority('PRODUTO_VISUALIZAR')"
+                                th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}">
+                        </strong>
                     </div>
 
                     <div class="field">
                         <span class="detail-label">Validade</span>
                         <strong th:text="${lote.dataValidade != null
                             ? #temporals.format(lote.dataValidade, 'dd/MM/yyyy')
-                            : 'Não informada'}"></strong>
+                            : 'Não informada'}">
+                        </strong>
                     </div>
 
                     <div class="field">
@@ -62,22 +72,25 @@
                         <strong th:text="${lote.produto.unidadeMedida.name()}"></strong>
                     </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${podeVisualizarQuantidades}">
                         <span class="detail-label">Total de entradas</span>
                         <strong th:text="${#numbers.formatDecimal(
-                            entradas, 1, 'POINT', 6, 'COMMA')}"></strong>
+                            entradas, 1, 'POINT', 6, 'COMMA')}">
+                        </strong>
                     </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${podeVisualizarQuantidades}">
                         <span class="detail-label">Total de saídas</span>
                         <strong th:text="${#numbers.formatDecimal(
-                            saidas, 1, 'POINT', 6, 'COMMA')}"></strong>
+                            saidas, 1, 'POINT', 6, 'COMMA')}">
+                        </strong>
                     </div>
 
-                    <div class="field">
+                    <div class="field" th:if="${podeVisualizarQuantidades}">
                         <span class="detail-label">Saldo registrado</span>
                         <strong th:text="${#numbers.formatDecimal(
-                            saldo, 1, 'POINT', 6, 'COMMA')}"></strong>
+                            saldo, 1, 'POINT', 6, 'COMMA')}">
+                        </strong>
                     </div>
                 </div>
             </section>
@@ -99,7 +112,9 @@
                                 <th scope="col">Tipo</th>
                                 <th scope="col">Documento</th>
                                 <th scope="col">Fornecedor / destinatário</th>
-                                <th scope="col">Quantidade</th>
+                                <th scope="col" th:if="${podeVisualizarQuantidades}">
+                                    Quantidade
+                                </th>
                                 <th scope="col">Responsável</th>
                             </tr>
                         </thead>
@@ -108,21 +123,42 @@
                                 <td th:text="${#temporals.format(
                                     movimento.registradoEm, 'dd/MM/yyyy HH:mm:ss XXX')}">
                                 </td>
-                                <td th:text="${movimento.tipo.name() == 'ENTRADA'
-                                    ? 'Entrada' : 'Saída'}"></td>
-                                <td>
-                                    <a th:if="${movimento.recebimentoId != null}"
-                                       th:href="@{/recebimentos/{id}(id=${movimento.recebimentoId})}"
-                                       th:text="${movimento.documento}"></a>
 
-                                    <a th:if="${movimento.expedicaoId != null}"
-                                       th:href="@{/expedicoes/{id}(id=${movimento.expedicaoId})}"
-                                       th:text="${movimento.documento}"></a>
+                                <td th:text="${movimento.tipo.name() == 'ENTRADA'
+                                    ? 'Entrada' : 'Saída'}">
                                 </td>
+
+                                <td>
+                                    <th:block th:if="${movimento.recebimentoId != null}">
+                                        <a sec:authorize="hasAuthority('RECEBIMENTO_VISUALIZAR')"
+                                           th:href="@{/recebimentos/{id}(id=${movimento.recebimentoId})}"
+                                           th:text="${movimento.documento}">
+                                        </a>
+
+                                        <span sec:authorize="!hasAuthority('RECEBIMENTO_VISUALIZAR')"
+                                              th:text="${movimento.documento}">
+                                        </span>
+                                    </th:block>
+
+                                    <th:block th:if="${movimento.expedicaoId != null}">
+                                        <a sec:authorize="hasAuthority('EXPEDICAO_VISUALIZAR')"
+                                           th:href="@{/expedicoes/{id}(id=${movimento.expedicaoId})}"
+                                           th:text="${movimento.documento}">
+                                        </a>
+
+                                        <span sec:authorize="!hasAuthority('EXPEDICAO_VISUALIZAR')"
+                                              th:text="${movimento.documento}">
+                                        </span>
+                                    </th:block>
+                                </td>
+
                                 <td th:text="${movimento.participante}"></td>
-                                <td th:text="${#numbers.formatDecimal(
-                                    movimento.quantidade, 1, 'POINT', 6, 'COMMA')}">
+
+                                <td th:if="${podeVisualizarQuantidades}"
+                                    th:text="${#numbers.formatDecimal(
+                                        movimento.quantidade, 1, 'POINT', 6, 'COMMA')}">
                                 </td>
+
                                 <td th:text="${movimento.responsavel}"></td>
                             </tr>
                         </tbody>

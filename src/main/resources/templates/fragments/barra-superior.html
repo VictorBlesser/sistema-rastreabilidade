@@ -11,17 +11,41 @@
 
         <nav class="topbar__modules" aria-label="Módulos do sistema">
             <a th:href="@{/}">Início</a>
-            <a th:href="@{/produtos}">Produtos</a>
-            <a th:href="@{/usuarios}" sec:authorize="hasRole('ADMINISTRADOR')">
+
+            <a th:href="@{/produtos}"
+               sec:authorize="hasAuthority('PRODUTO_VISUALIZAR')">
+                Produtos
+            </a>
+
+            <a th:href="@{/usuarios}"
+               sec:authorize="hasAuthority('USUARIO_VISUALIZAR')">
                 Usuários
             </a>
-            <a th:href="@{/lotes}">Lotes</a>
-            <a th:href="@{/recebimentos}">Recebimento</a>
-            <a th:href="@{/estoque}">Estoque</a>
-            <a th:href="@{/expedicoes}">Expedição</a>
-            <a th:href="@{/rastreabilidade}">Rastreabilidade</a>
-            <span title="Módulo futuro">Qualidade</span>
-            <span title="Módulo futuro">Relatórios</span>
+
+            <a th:href="@{/lotes}"
+               sec:authorize="hasAuthority('LOTE_VISUALIZAR')">
+                Lotes
+            </a>
+
+            <a th:href="@{/recebimentos}"
+               sec:authorize="hasAuthority('RECEBIMENTO_VISUALIZAR')">
+                Recebimento
+            </a>
+
+            <a th:href="@{/estoque}"
+               sec:authorize="hasAuthority('ESTOQUE_QUANTIDADE_FISICA_VISUALIZAR')">
+                Estoque
+            </a>
+
+            <a th:href="@{/expedicoes}"
+               sec:authorize="hasAuthority('EXPEDICAO_VISUALIZAR')">
+                Expedição
+            </a>
+
+            <a th:href="@{/rastreabilidade}"
+               sec:authorize="hasAuthority('RASTREABILIDADE_VISUALIZAR')">
+                Rastreabilidade
+            </a>
         </nav>
 
         <div class="topbar__user" sec:authorize="isAuthenticated()">

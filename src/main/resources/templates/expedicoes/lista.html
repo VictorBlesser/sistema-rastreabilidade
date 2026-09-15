@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,20 +16,28 @@
             <div>
                 <p class="tag">Expedição</p>
                 <h1>Expedições cadastradas</h1>
-                <p class="intro">Prepare os itens e confirme as saídas do estoque.</p>
+                <p class="intro">Consulte as expedições e suas saídas do estoque.</p>
             </div>
-            <a class="button" th:href="@{/expedicoes/novo}">Nova expedição</a>
+
+            <a class="button"
+               sec:authorize="hasAuthority('EXPEDICAO_CRIAR')"
+               th:href="@{/expedicoes/novo}">
+                Nova expedição
+            </a>
         </div>
 
         <div class="alert alert-success" role="status"
-             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        </div>
+
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <section class="panel" aria-label="Lista de expedições">
             <div class="empty-state" th:if="${#lists.isEmpty(expedicoes)}">
                 <strong>Nenhuma expedição cadastrada</strong>
-                <p>Comece criando um rascunho.</p>
+                <p>As expedições cadastradas aparecerão nesta lista.</p>
             </div>
 
             <div class="table-wrapper" th:unless="${#lists.isEmpty(expedicoes)}">
@@ -46,9 +56,11 @@
                             <td th:text="${expedicao.documento}"></td>
                             <td th:text="${expedicao.destinatario}"></td>
                             <td th:text="${#temporals.format(
-                                expedicao.dataExpedicao, 'dd/MM/yyyy')}"></td>
+                                expedicao.dataExpedicao, 'dd/MM/yyyy')}">
+                            </td>
                             <td th:text="${expedicao.rascunho
-                                ? 'Rascunho' : 'Confirmado'}"></td>
+                                ? 'Rascunho' : 'Confirmado'}">
+                            </td>
                             <td>
                                 <a class="button button-ghost"
                                    th:href="@{/expedicoes/{id}(id=${expedicao.id})}">

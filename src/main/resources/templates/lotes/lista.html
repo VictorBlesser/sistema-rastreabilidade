@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,20 +24,30 @@
                 <h1>Lotes cadastrados</h1>
                 <p class="intro">Consulte os lotes de cada produto e suas datas.</p>
             </div>
-            <a class="button" th:href="@{/lotes/novo}">Cadastrar lote</a>
+
+            <a class="button"
+               sec:authorize="hasAuthority('LOTE_CADASTRAR')"
+               th:href="@{/lotes/novo}">
+                Cadastrar lote
+            </a>
         </div>
 
         <div class="alert alert-success" role="status"
-             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        </div>
 
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <section class="panel" aria-label="Lista de lotes">
             <div class="empty-state" th:if="${#lists.isEmpty(lotes)}">
                 <strong>Nenhum lote cadastrado</strong>
-                <p>Cadastre um lote para um produto com controle de lote.</p>
-                <a class="button button-secondary" th:href="@{/lotes/novo}">
+                <p>Os lotes cadastrados aparecerão nesta lista.</p>
+
+                <a class="button button-secondary"
+                   sec:authorize="hasAuthority('LOTE_CADASTRAR')"
+                   th:href="@{/lotes/novo}">
                     Cadastrar primeiro lote
                 </a>
             </div>
@@ -58,14 +70,17 @@
                             <td class="code" th:text="${lote.numero}"></td>
                             <td th:text="${lote.dataFabricacao != null
                                 ? #temporals.format(lote.dataFabricacao, 'dd/MM/yyyy')
-                                : 'Não informada'}"></td>
+                                : 'Não informada'}">
+                            </td>
                             <td th:text="${lote.dataValidade != null
                                 ? #temporals.format(lote.dataValidade, 'dd/MM/yyyy')
-                                : 'Não informada'}"></td>
+                                : 'Não informada'}">
+                            </td>
                             <td>
                                 <span class="status"
                                       th:classappend="${lote.ativo} ? ' status-active' : ' status-inactive'"
-                                      th:text="${lote.ativo ? 'Ativo' : 'Inativo'}"></span>
+                                      th:text="${lote.ativo ? 'Ativo' : 'Inativo'}">
+                                </span>
                             </td>
                             <td>
                                 <a class="button button-ghost"

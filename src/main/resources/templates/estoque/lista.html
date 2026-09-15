@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,10 +18,13 @@
                 <h1>Estoque por produto e lote</h1>
                 <p class="intro">
                     Quantidades calculadas a partir das movimentações registradas.
-                    Recebimentos em rascunho não alteram o saldo.
+                    Rascunhos não alteram o saldo.
                 </p>
             </div>
-            <a class="button" th:href="@{/recebimentos/novo}">
+
+            <a class="button"
+               sec:authorize="hasAuthority('RECEBIMENTO_CRIAR')"
+               th:href="@{/recebimentos/novo}">
                 Novo recebimento
             </a>
         </div>
@@ -27,7 +32,7 @@
         <section class="panel" aria-label="Saldos de estoque">
             <div class="empty-state" th:if="${#lists.isEmpty(saldos)}">
                 <strong>Nenhuma movimentação registrada</strong>
-                <p>Confirme um recebimento para registrar a primeira entrada.</p>
+                <p>Os saldos aparecerão após o registro de movimentações.</p>
             </div>
 
             <div class="table-wrapper" th:unless="${#lists.isEmpty(saldos)}">
@@ -45,21 +50,44 @@
                     <tbody>
                         <tr th:each="saldo : ${saldos}">
                             <td class="code" th:text="${saldo.codigo}"></td>
+
                             <td>
-                                <a th:href="@{/produtos/{id}(id=${saldo.produtoId})}"
-                                   th:text="${saldo.nome}"></a>
+                                <a sec:authorize="hasAuthority('PRODUTO_VISUALIZAR')"
+                                   th:href="@{/produtos/{id}(id=${saldo.produtoId})}"
+                                   th:text="${saldo.nome}">
+                                </a>
+
+                                <span sec:authorize="!hasAuthority('PRODUTO_VISUALIZAR')"
+                                      th:text="${saldo.nome}">
+                                </span>
                             </td>
+
                             <td>
-                                <a th:if="${saldo.loteId != null}"
-                                   th:href="@{/lotes/{id}(id=${saldo.loteId})}"
-                                   th:text="${saldo.numeroLote}"></a>
-                                <span th:if="${saldo.loteId == null}">Sem lote</span>
+                                <th:block th:if="${saldo.loteId != null}">
+                                    <a sec:authorize="hasAuthority('LOTE_VISUALIZAR')"
+                                       th:href="@{/lotes/{id}(id=${saldo.loteId})}"
+                                       th:text="${saldo.numeroLote}">
+                                    </a>
+
+                                    <span sec:authorize="!hasAuthority('LOTE_VISUALIZAR')"
+                                          th:text="${saldo.numeroLote}">
+                                    </span>
+                                </th:block>
+
+                                <span th:if="${saldo.loteId == null}">
+                                    Sem lote
+                                </span>
                             </td>
+
                             <td th:text="${saldo.dataValidade != null
                                 ? #temporals.format(saldo.dataValidade, 'dd/MM/yyyy')
-                                : 'Não informada'}"></td>
+                                : 'Não informada'}">
+                            </td>
+
                             <td th:text="${#numbers.formatDecimal(
-                                saldo.quantidade, 1, 'POINT', 6, 'COMMA')}"></td>
+                                saldo.quantidade, 1, 'POINT', 6, 'COMMA')}">
+                            </td>
+
                             <td th:text="${saldo.unidadeMedida.name()}"></td>
                         </tr>
                     </tbody>

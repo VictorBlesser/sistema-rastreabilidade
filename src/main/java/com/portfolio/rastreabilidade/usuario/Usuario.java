@@ -1,12 +1,23 @@
 package com.portfolio.rastreabilidade.usuario;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.portfolio.rastreabilidade.acesso.PerfilAcesso;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,6 +40,13 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private PerfilUsuario perfil;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "usuario_perfil",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+    private Set<PerfilAcesso> perfis = new LinkedHashSet<>();
 
     @Column(nullable = false)
     private boolean ativo;
@@ -65,6 +83,25 @@ public class Usuario {
         this.ativo = true;
     }
 
+    void vincularPerfilInicial(PerfilAcesso perfilAcesso) {
+        if (id != null || !perfis.isEmpty()) {
+            throw new IllegalStateException(
+                    "O perfil inicial só pode ser vinculado no cadastro");
+        }
+
+        if (perfilAcesso == null || perfilAcesso.getId() == null) {
+            throw new IllegalArgumentException(
+                    "O perfil de acesso precisa estar cadastrado");
+        }
+
+        if (!perfil.name().equals(perfilAcesso.getCodigo())) {
+            throw new IllegalArgumentException(
+                    "O perfil de acesso não corresponde ao perfil informado");
+        }
+
+        perfis.add(perfilAcesso);
+    }
+
     public Long getId() {
         return id;
     }
@@ -85,6 +122,18 @@ public class Usuario {
         return perfil;
     }
 
+    public Set<PerfilAcesso> getPerfis() {
+        return Collections.unmodifiableSet(perfis);
+    }
+
+    public Set<String> getCodigosPermissoes() {
+        return perfis.stream()
+                .flatMap(perfilAcesso ->
+                        perfilAcesso.getPermissoes().stream())
+                .map(permissao -> permissao.getCodigo())
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
     public boolean isAtivo() {
         return ativo;
     }
@@ -92,7 +141,8 @@ public class Usuario {
     public void inativar() {
         this.ativo = false;
     }
+
     public void ativar() {
-    this.ativo = true;
+        this.ativo = true;
     }
 }

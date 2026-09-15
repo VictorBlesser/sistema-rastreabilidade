@@ -1,5 +1,7 @@
 package com.portfolio.rastreabilidade.usuario;
 
+import java.util.List;
+
 import jakarta.validation.Valid;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,14 +22,19 @@ public class UsuarioController {
     private static final String FORMULARIO = "usuarios/formulario";
 
     private final UsuarioService service;
+    private final UsuarioAcessoTelaService acessoTela;
 
-    public UsuarioController(UsuarioService service) {
+    public UsuarioController(
+            UsuarioService service,
+            UsuarioAcessoTelaService acessoTela) {
+
         this.service = service;
+        this.acessoTela = acessoTela;
     }
 
     @ModelAttribute("perfis")
-    PerfilUsuario[] perfis() {
-        return PerfilUsuario.values();
+    List<PerfilUsuario> perfis() {
+        return acessoTela.perfisPermitidos();
     }
 
     @GetMapping
@@ -72,8 +79,7 @@ public class UsuarioController {
         }
 
         redirectAttributes.addFlashAttribute(
-                "mensagemSucesso",
-                "Usuário cadastrado com sucesso");
+                "mensagemSucesso", "Usuário cadastrado com sucesso");
 
         return "redirect:/usuarios";
     }
@@ -86,11 +92,13 @@ public class UsuarioController {
 
         try {
             model.addAttribute("usuario", service.buscarPorId(id));
+            model.addAttribute(
+                    "podeAlterarStatus", acessoTela.podeAlterarStatus(id));
+
             return "usuarios/detalhe";
         } catch (IllegalArgumentException erro) {
             redirectAttributes.addFlashAttribute(
-                    "mensagemErro",
-                    erro.getMessage());
+                    "mensagemErro", erro.getMessage());
 
             return "redirect:/usuarios";
         }
@@ -105,37 +113,34 @@ public class UsuarioController {
             service.inativar(id);
 
             redirectAttributes.addFlashAttribute(
-                    "mensagemSucesso",
-                    "Usuário inativado com sucesso");
+                    "mensagemSucesso", "Usuário inativado com sucesso");
 
             return "redirect:/usuarios/" + id;
         } catch (IllegalArgumentException erro) {
             redirectAttributes.addFlashAttribute(
-                    "mensagemErro",
-                    erro.getMessage());
+                    "mensagemErro", erro.getMessage());
 
             return "redirect:/usuarios";
         }
     }
+
     @PostMapping("/{id}/ativar")
-String ativar(
-        @PathVariable Long id,
-        RedirectAttributes redirectAttributes) {
+    String ativar(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
 
-    try {
-        service.ativar(id);
+        try {
+            service.ativar(id);
 
-        redirectAttributes.addFlashAttribute(
-                "mensagemSucesso",
-                "Usuário ativado com sucesso");
+            redirectAttributes.addFlashAttribute(
+                    "mensagemSucesso", "Usuário ativado com sucesso");
 
-        return "redirect:/usuarios/" + id;
-    } catch (IllegalArgumentException erro) {
-        redirectAttributes.addFlashAttribute(
-                "mensagemErro",
-                erro.getMessage());
+            return "redirect:/usuarios/" + id;
+        } catch (IllegalArgumentException erro) {
+            redirectAttributes.addFlashAttribute(
+                    "mensagemErro", erro.getMessage());
 
-        return "redirect:/usuarios";
+            return "redirect:/usuarios";
+        }
     }
-}
 }

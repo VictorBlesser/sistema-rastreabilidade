@@ -2,7 +2,14 @@ package com.portfolio.rastreabilidade.usuario;
 
 import java.util.List;
 
+import com.portfolio.rastreabilidade.acesso.PerfilAcesso;
+import com.portfolio.rastreabilidade.acesso.PerfilAcessoRepository;
+
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +19,19 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final PerfilAcessoRepository perfilRepository;
+    private final UsuarioPoliticaAcesso politica;
 
     public UsuarioService(
             UsuarioRepository repository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            PerfilAcessoRepository perfilRepository,
+            UsuarioPoliticaAcesso politica) {
 
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.perfilRepository = perfilRepository;
+        this.politica = politica;
     }
 
     @Transactional
@@ -48,13 +61,20 @@ public class UsuarioService {
             throw new IllegalArgumentException("Login já cadastrado");
         }
 
-        String senhaHash = passwordEncoder.encode(senha);
+        PerfilAcesso perfilAcesso = perfilRepository
+                .findByCodigo(perfil.name())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Perfil de acesso não cadastrado"));
+
+        politica.validarCadastro(operadorAtual(), perfilAcesso);
 
         Usuario usuario = new Usuario(
                 nome,
                 login,
-                senhaHash,
+                passwordEncoder.encode(senha),
                 perfil);
+
+        usuario.vincularPerfilInicial(perfilAcesso);
 
         return repository.save(usuario);
     }
@@ -71,35 +91,44 @@ public class UsuarioService {
         }
 
         return repository.findById(id)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Usuário não encontrado"));
     }
 
     @Transactional
-public Usuario inativar(Long id) {
-    Usuario usuario = buscarPorId(id);
+    public Usuario inativar(Long id) {
+        Usuario usuario = buscarPorId(id);
 
-    if (usuario.getPerfil() == PerfilUsuario.ADMINISTRADOR) {
-        throw new IllegalArgumentException(
-                "Usuários administradores não podem ser inativados");
+        politica.validarAlteracaoStatus(operadorAtual(), usuario);
+
+        usuario.inativar();
+        return repository.save(usuario);
     }
 
-    usuario.inativar();
+    @Transactional
+    public Usuario ativar(Long id) {
+        Usuario usuario = buscarPorId(id);
 
-    return repository.save(usuario);
-}
+        politica.validarAlteracaoStatus(operadorAtual(), usuario);
 
-@Transactional
-public Usuario ativar(Long id) {
-    Usuario usuario = buscarPorId(id);
-
-    if (usuario.getPerfil() == PerfilUsuario.ADMINISTRADOR) {
-        throw new IllegalArgumentException(
-                "Usuários administradores não podem ser reativados por esta ação");
+        usuario.ativar();
+        return repository.save(usuario);
     }
 
-    usuario.ativar();
+    private Usuario operadorAtual() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
 
-    return repository.save(usuario);
-}
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException(
+                    "É necessário estar autenticado para executar esta operação");
+        }
+
+        return repository.buscarComAcessosPorLogin(authentication.getName())
+                .orElseThrow(() -> new AccessDeniedException(
+                        "Usuário autenticado não encontrado"));
+    }
 }

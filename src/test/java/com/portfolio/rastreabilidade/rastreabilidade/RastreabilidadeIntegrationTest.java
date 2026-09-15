@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "admin", roles = "ADMINISTRADOR")
+@WithUserDetails("admin")
 class RastreabilidadeIntegrationTest {
 
     private static final LocalDate DATA = LocalDate.of(2026, 9, 14);
@@ -155,7 +156,7 @@ class RastreabilidadeIntegrationTest {
         verificarTotais(segundo, "7", "0", "7");
     }
 
-        @Test
+    @Test
     void deveRenderizarConsultaEHistoricoComLinks() throws Exception {
         Long recebimentoId = criarRecebimento(loteId, "10.50");
         recebimentoService.confirmar(recebimentoId);
@@ -201,6 +202,34 @@ class RastreabilidadeIntegrationTest {
         mockMvc.perform(get("/rastreabilidade")
                         .param("loteId", loteId.toString()))
                 .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMINISTRADOR")
+    void nomeDoPerfilNaoDeveSubstituirPermissao() throws Exception {
+        mockMvc.perform(get("/rastreabilidade"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/rastreabilidade")
+                        .param("loteId", loteId.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ESTOQUE_QUANTIDADE_FISICA_VISUALIZAR")
+    void acessoAoEstoqueNaoDeveLiberarRastreabilidade() throws Exception {
+        mockMvc.perform(get("/rastreabilidade")
+                        .param("loteId", loteId.toString()))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = "RASTREABILIDADE_VISUALIZAR")
+    void devePermitirConsultaComPermissaoEspecifica() throws Exception {
+        mockMvc.perform(get("/rastreabilidade")
+                        .param("loteId", loteId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("RAST-A")));
     }
 
     private Long criarRecebimento(Long lote, String quantidade) {

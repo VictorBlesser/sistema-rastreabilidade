@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-@WithMockUser(username = "admin", roles = "ADMINISTRADOR")
+@WithUserDetails("admin")
 class ExpedicaoWebTest {
 
     @Autowired
@@ -94,7 +95,11 @@ class ExpedicaoWebTest {
     }
 
     @Test
+    @WithMockUser(authorities = "EXPEDICAO_CRIAR")
     void deveCriarRascunhoPeloFormulario() throws Exception {
+        mockMvc.perform(get("/expedicoes/novo"))
+                .andExpect(status().isOk());
+
         String destino = mockMvc.perform(post("/expedicoes")
                         .with(csrf())
                         .param("destinatario", "Destinatário cadastrado pela tela")
@@ -185,9 +190,7 @@ class ExpedicaoWebTest {
     @Test
     void deveExibirErroQuandoSaldoForInsuficiente() throws Exception {
         registrarEntrada("1");
-
-        service.adicionarItem(
-                expedicaoId, produtoId, null, new BigDecimal("2"));
+        adicionarItemDeTeste();
 
         mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar")
                         .with(csrf()))
@@ -196,21 +199,14 @@ class ExpedicaoWebTest {
                 .andExpect(flash().attribute(
                         "mensagemErro", containsString("Saldo insuficiente")));
 
-        assertTrue(service.buscarPorId(expedicaoId).isRascunho());
-
-        assertTrue(movimentacaoRepository
-                .findByExpedicaoItemExpedicaoIdOrderByIdAsc(expedicaoId)
-                .isEmpty());
-
+        verificarRascunhoSemSaidas();
         verificarSaldo("1");
     }
 
     @Test
     void deveRecusarConfirmacaoRepetidaSemDuplicarSaida() throws Exception {
         registrarEntrada("5");
-
-        service.adicionarItem(
-                expedicaoId, produtoId, null, new BigDecimal("2"));
+        adicionarItemDeTeste();
 
         service.confirmar(expedicaoId);
 
@@ -246,7 +242,7 @@ class ExpedicaoWebTest {
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
 
-        assertTrue(service.buscarPorId(expedicaoId).isRascunho());
+        verificarRascunhoSemSaidas();
     }
 
     @Test
@@ -254,7 +250,105 @@ class ExpedicaoWebTest {
         mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar"))
                 .andExpect(status().isForbidden());
 
-        assertTrue(service.buscarPorId(expedicaoId).isRascunho());
+        verificarRascunhoSemSaidas();
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = "EXPEDICAO_VISUALIZAR")
+    void consultaNaoDevePermitirAlteracoes() throws Exception {
+        registrarEntrada("5");
+        adicionarItemDeTeste();
+
+        mockMvc.perform(get("/expedicoes"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/expedicoes/" + expedicaoId))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/expedicoes/novo"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/expedicoes")
+                        .with(csrf())
+                        .param("destinatario", "Destinatário")
+                        .param("documento", "NEGADO")
+                        .param("dataExpedicao", "2026-09-14"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/itens")
+                        .with(csrf())
+                        .param("produtoId", produtoId.toString())
+                        .param("quantidade", "1"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        assertEquals(1, service.buscarPorId(expedicaoId).getItens().size());
+        verificarRascunhoSemSaidas();
+        verificarSaldo("5");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = "EXPEDICAO_EDITAR")
+    void editarItensNaoDevePermitirConfirmacao() throws Exception {
+        registrarEntrada("5");
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/itens")
+                        .with(csrf())
+                        .param("produtoId", produtoId.toString())
+                        .param("quantidade", "2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("mensagemSucesso"));
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        assertEquals(1, service.buscarPorId(expedicaoId).getItens().size());
+        verificarRascunhoSemSaidas();
+        verificarSaldo("5");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = "EXPEDICAO_CONFIRMAR")
+    void deveConfirmarComPermissaoEspecifica() throws Exception {
+        registrarEntrada("5");
+        adicionarItemDeTeste();
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar")
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(flash().attributeExists("mensagemSucesso"));
+
+        assertEquals(
+                StatusExpedicao.CONFIRMADO,
+                service.buscarPorId(expedicaoId).getStatus());
+
+        assertEquals(1, movimentacaoRepository
+                .findByExpedicaoItemExpedicaoIdOrderByIdAsc(expedicaoId)
+                .size());
+
+        verificarSaldo("3");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMINISTRADOR")
+    void nomeDoPerfilNaoDeveSubstituirPermissao() throws Exception {
+        mockMvc.perform(get("/expedicoes"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/expedicoes/" + expedicaoId + "/confirmar")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        verificarRascunhoSemSaidas();
+    }
+
+    private void adicionarItemDeTeste() {
+        service.adicionarItem(
+                expedicaoId, produtoId, null, new BigDecimal("2"));
     }
 
     private void registrarEntrada(String quantidade) {
@@ -276,5 +370,13 @@ class ExpedicaoWebTest {
                 TipoMovimentacao.ENTRADA);
 
         assertEquals(0, new BigDecimal(esperado).compareTo(saldo));
+    }
+
+    private void verificarRascunhoSemSaidas() {
+        assertTrue(service.buscarPorId(expedicaoId).isRascunho());
+
+        assertTrue(movimentacaoRepository
+                .findByExpedicaoItemExpedicaoIdOrderByIdAsc(expedicaoId)
+                .isEmpty());
     }
 }

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,9 +16,12 @@
         <h1 th:text="${'Documento ' + recebimento.documento}"></h1>
 
         <div class="alert alert-success" role="status"
-             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        </div>
+
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <section class="panel form" aria-label="Dados do recebimento">
             <div class="form-grid">
@@ -24,16 +29,21 @@
                     <span class="detail-label">Fornecedor</span>
                     <strong th:text="${recebimento.fornecedor}"></strong>
                 </div>
+
                 <div class="field">
                     <span class="detail-label">Data</span>
                     <strong th:text="${#temporals.format(
-                        recebimento.dataRecebimento, 'dd/MM/yyyy')}"></strong>
+                        recebimento.dataRecebimento, 'dd/MM/yyyy')}">
+                    </strong>
                 </div>
+
                 <div class="field">
                     <span class="detail-label">Situação</span>
                     <strong th:text="${recebimento.rascunho
-                        ? 'Rascunho' : 'Confirmado'}"></strong>
+                        ? 'Rascunho' : 'Confirmado'}">
+                    </strong>
                 </div>
+
                 <div class="field" th:unless="${recebimento.rascunho}">
                     <span class="detail-label">Confirmado por</span>
                     <strong th:text="${recebimento.confirmadoPor.nome}"></strong>
@@ -64,7 +74,8 @@
                             <td th:text="${item.produto.codigo + ' — ' + item.produto.nome}"></td>
                             <td th:text="${item.lote != null ? item.lote.numero : 'Sem lote'}"></td>
                             <td th:text="${#numbers.formatDecimal(
-                                item.quantidade, 1, 'POINT', 6, 'COMMA')}"></td>
+                                item.quantidade, 1, 'POINT', 6, 'COMMA')}">
+                            </td>
                             <td th:text="${item.produto.unidadeMedida.name()}"></td>
                         </tr>
                     </tbody>
@@ -74,6 +85,7 @@
 
         <section th:if="${recebimento.rascunho}">
             <form class="form panel" method="post" novalidate
+                  sec:authorize="hasAuthority('RECEBIMENTO_EDITAR')"
                   th:action="@{/recebimentos/{id}/itens(id=${recebimento.id})}"
                   th:object="${itemForm}">
                 <h2>Adicionar item</h2>
@@ -81,7 +93,9 @@
                 <div class="alert alert-danger" role="alert"
                      th:if="${#fields.hasAnyErrors()}">
                     <p>Revise os dados do item.</p>
-                    <p th:each="erro : ${#fields.globalErrors()}" th:text="${erro}"></p>
+                    <p th:each="erro : ${#fields.globalErrors()}"
+                       th:text="${erro}">
+                    </p>
                 </div>
 
                 <div class="form-grid">
@@ -99,7 +113,8 @@
                             </option>
                         </select>
                         <span id="produto-erro" class="field-error"
-                              th:errors="*{produtoId}"></span>
+                              th:errors="*{produtoId}">
+                        </span>
                     </div>
 
                     <div class="field">
@@ -118,7 +133,8 @@
                             Obrigatório para produtos com controle de lote.
                         </small>
                         <span id="lote-erro" class="field-error"
-                              th:errors="*{loteId}"></span>
+                              th:errors="*{loteId}">
+                        </span>
                     </div>
 
                     <div class="field">
@@ -132,7 +148,8 @@
                             Produtos não fracionáveis aceitam apenas números inteiros.
                         </small>
                         <span id="quantidade-erro" class="field-error"
-                              th:errors="*{quantidade}"></span>
+                              th:errors="*{quantidade}">
+                        </span>
                     </div>
                 </div>
 
@@ -142,6 +159,7 @@
             </form>
 
             <form class="panel form" method="post"
+                  sec:authorize="hasAuthority('RECEBIMENTO_CONFIRMAR')"
                   th:if="${!#lists.isEmpty(recebimento.itens)}"
                   th:action="@{/recebimentos/{id}/confirmar(id=${recebimento.id})}">
                 <h2>Confirmar recebimento</h2>
@@ -149,7 +167,9 @@
                     Confira os itens. A confirmação registra as entradas no estoque
                     e encerra a inclusão de itens neste recebimento.
                 </p>
-                <button class="button" type="submit">Confirmar entrada no estoque</button>
+                <button class="button" type="submit">
+                    Confirmar entrada no estoque
+                </button>
             </form>
         </section>
 

@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,20 +16,28 @@
             <div>
                 <p class="tag">Recebimento</p>
                 <h1>Recebimentos cadastrados</h1>
-                <p class="intro">Prepare os itens e confirme as entradas no estoque.</p>
+                <p class="intro">Consulte os recebimentos e suas entradas no estoque.</p>
             </div>
-            <a class="button" th:href="@{/recebimentos/novo}">Novo recebimento</a>
+
+            <a class="button"
+               sec:authorize="hasAuthority('RECEBIMENTO_CRIAR')"
+               th:href="@{/recebimentos/novo}">
+                Novo recebimento
+            </a>
         </div>
 
         <div class="alert alert-success" role="status"
-             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+        </div>
+
         <div class="alert alert-danger" role="alert"
-             th:if="${mensagemErro}" th:text="${mensagemErro}"></div>
+             th:if="${mensagemErro}" th:text="${mensagemErro}">
+        </div>
 
         <section class="panel" aria-label="Lista de recebimentos">
             <div class="empty-state" th:if="${#lists.isEmpty(recebimentos)}">
                 <strong>Nenhum recebimento cadastrado</strong>
-                <p>Comece criando um rascunho.</p>
+                <p>Os recebimentos cadastrados aparecerão nesta lista.</p>
             </div>
 
             <div class="table-wrapper" th:unless="${#lists.isEmpty(recebimentos)}">
@@ -46,9 +56,11 @@
                             <td th:text="${recebimento.documento}"></td>
                             <td th:text="${recebimento.fornecedor}"></td>
                             <td th:text="${#temporals.format(
-                                recebimento.dataRecebimento, 'dd/MM/yyyy')}"></td>
+                                recebimento.dataRecebimento, 'dd/MM/yyyy')}">
+                            </td>
                             <td th:text="${recebimento.rascunho
-                                ? 'Rascunho' : 'Confirmado'}"></td>
+                                ? 'Rascunho' : 'Confirmado'}">
+                            </td>
                             <td>
                                 <a class="button button-ghost"
                                    th:href="@{/recebimentos/{id}(id=${recebimento.id})}">

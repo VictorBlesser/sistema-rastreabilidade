@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Produtos | Sistema de Rastreabilidade</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-
 <body>
     <header th:replace="~{fragments/barra-superior :: barraSuperior}"></header>
+
     <main class="container">
         <nav class="breadcrumb" aria-label="Navegação estrutural">
             <a th:href="@{/}">Início</a>
@@ -23,11 +24,16 @@
                 <h1>Produtos cadastrados</h1>
                 <p class="intro">Consulte os produtos e seus controles de lote e validade.</p>
             </div>
-            <a class="button" th:href="@{/produtos/novo}">Cadastrar produto</a>
+
+            <a class="button"
+               sec:authorize="hasAuthority('PRODUTO_CADASTRAR')"
+               th:href="@{/produtos/novo}">
+                Cadastrar produto
+            </a>
         </div>
 
-        <div class="alert alert-success" role="status" th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
-            Produto cadastrado com sucesso
+        <div class="alert alert-success" role="status"
+             th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
         </div>
 
         <section class="panel" aria-labelledby="titulo-lista">
@@ -35,8 +41,13 @@
 
             <div class="empty-state" th:if="${#lists.isEmpty(produtos)}">
                 <strong>Nenhum produto cadastrado</strong>
-                <p>Comece registrando o primeiro produto do sistema.</p>
-                <a class="button button-secondary" th:href="@{/produtos/novo}">Cadastrar primeiro produto</a>
+                <p>Os produtos cadastrados aparecerão nesta lista.</p>
+
+                <a class="button button-secondary"
+                   sec:authorize="hasAuthority('PRODUTO_CADASTRAR')"
+                   th:href="@{/produtos/novo}">
+                    Cadastrar primeiro produto
+                </a>
             </div>
 
             <div class="table-wrapper" th:unless="${#lists.isEmpty(produtos)}">
@@ -54,19 +65,22 @@
                     </thead>
                     <tbody>
                         <tr th:each="produto : ${produtos}">
-                            <td class="code" th:text="${produto.codigo}">CAT-001</td>
-                            <td th:text="${produto.nome}">Cateter</td>
-                            <td th:text="${produto.tipo.rotulo}">Produto médico</td>
-                            <td th:text="${produto.controlaLote ? 'Sim' : 'Não'}">Sim</td>
-                            <td th:text="${produto.controlaValidade ? 'Sim' : 'Não'}">Sim</td>
+                            <td class="code" th:text="${produto.codigo}"></td>
+                            <td th:text="${produto.nome}"></td>
+                            <td th:text="${produto.tipo.rotulo}"></td>
+                            <td th:text="${produto.controlaLote ? 'Sim' : 'Não'}"></td>
+                            <td th:text="${produto.controlaValidade ? 'Sim' : 'Não'}"></td>
                             <td>
                                 <span class="status"
-                                    th:classappend="${produto.ativo} ? ' status-active' : ' status-inactive'"
-                                    th:text="${produto.ativo ? 'Ativo' : 'Inativo'}">Ativo</span>
+                                      th:classappend="${produto.ativo} ? ' status-active' : ' status-inactive'"
+                                      th:text="${produto.ativo ? 'Ativo' : 'Inativo'}">
+                                </span>
                             </td>
                             <td>
-                                <a class="button button-ghost" th:href="@{/produtos/{id}(id=${produto.id})}">Ver
-                                    detalhes</a>
+                                <a class="button button-ghost"
+                                   th:href="@{/produtos/{id}(id=${produto.id})}">
+                                    Ver detalhes
+                                </a>
                             </td>
                         </tr>
                     </tbody>
@@ -75,5 +89,4 @@
         </section>
     </main>
 </body>
-
 </html>

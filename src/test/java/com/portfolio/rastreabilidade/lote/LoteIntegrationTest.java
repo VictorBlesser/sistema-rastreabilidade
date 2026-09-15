@@ -2,6 +2,7 @@ package com.portfolio.rastreabilidade.lote;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.portfolio.rastreabilidade.produto.Produto;
 import com.portfolio.rastreabilidade.produto.ProdutoRepository;
@@ -50,7 +52,7 @@ class LoteIntegrationTest {
     @BeforeEach
     void prepararProduto() {
         produto = produtoRepository.saveAndFlush(new Produto(
-                "LOTE-TESTE-001",
+                "LOT-" + UUID.randomUUID(),
                 "Produto para teste de lote",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
@@ -81,9 +83,7 @@ class LoteIntegrationTest {
         IllegalArgumentException erro = assertThrows(
                 IllegalArgumentException.class,
                 () -> service.cadastrar(
-                        produto.getId(),
-                        " lt-001 ",
-                        null,
+                        produto.getId(), " lt-001 ", null,
                         LocalDate.of(2027, 1, 1)));
 
         assertEquals(
@@ -94,7 +94,7 @@ class LoteIntegrationTest {
     @Test
     void devePermitirMesmoNumeroEmProdutosDiferentes() {
         Produto outro = produtoRepository.saveAndFlush(new Produto(
-                "LOTE-TESTE-002",
+                "OUT-" + UUID.randomUUID(),
                 "Outro produto",
                 TipoProduto.PRODUTO_MEDICO,
                 true,
@@ -143,9 +143,7 @@ class LoteIntegrationTest {
         IllegalArgumentException erro = assertThrows(
                 IllegalArgumentException.class,
                 () -> service.cadastrar(
-                        produto.getId(),
-                        "LT-001",
-                        null,
+                        produto.getId(), "LT-001", null,
                         LocalDate.of(2027, 1, 1)));
 
         assertEquals("O produto está inativo", erro.getMessage());
@@ -154,7 +152,7 @@ class LoteIntegrationTest {
     @Test
     void deveRejeitarProdutoSemControleDeLote() {
         Produto semControle = produtoRepository.saveAndFlush(new Produto(
-                "LOTE-TESTE-003",
+                "SEM-" + UUID.randomUUID(),
                 "Produto sem controle",
                 TipoProduto.PRODUTO_MEDICO,
                 false,
@@ -169,7 +167,7 @@ class LoteIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMINISTRADOR")
+    @WithMockUser(authorities = "LOTE_CADASTRAR")
     void deveRenderizarFormulario() throws Exception {
         mockMvc.perform(get("/lotes/novo"))
                 .andExpect(status().isOk())
@@ -179,7 +177,7 @@ class LoteIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMINISTRADOR")
+    @WithMockUser(authorities = "LOTE_CADASTRAR")
     void deveCadastrarPelaTela() throws Exception {
         mockMvc.perform(post("/lotes")
                         .with(csrf())
@@ -195,12 +193,10 @@ class LoteIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMINISTRADOR")
+    @WithMockUser(authorities = "LOTE_VISUALIZAR")
     void deveRenderizarListaEDetalhes() throws Exception {
         Lote lote = service.cadastrar(
-                produto.getId(),
-                "LT-DETALHE",
-                null,
+                produto.getId(), "LT-DETALHE", null,
                 LocalDate.of(2027, 1, 1));
 
         mockMvc.perform(get("/lotes"))
@@ -214,7 +210,7 @@ class LoteIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMINISTRADOR")
+    @WithMockUser(authorities = "LOTE_CADASTRAR")
     void deveExibirErroQuandoValidadeObrigatoriaNaoFoiInformada()
             throws Exception {
 
@@ -234,12 +230,56 @@ class LoteIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMINISTRADOR")
+    @WithMockUser(authorities = "LOTE_CADASTRAR")
     void deveRecusarCadastroSemCsrf() throws Exception {
         mockMvc.perform(post("/lotes")
                         .param("produtoId", produto.getId().toString())
                         .param("numero", "LT-SEM-CSRF")
                         .param("dataValidade", "2027-01-01"))
                 .andExpect(status().isForbidden());
+
+        assertFalse(repository.existsByProdutoIdAndNumero(
+                produto.getId(), "LT-SEM-CSRF"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "LOTE_VISUALIZAR")
+    void consultaNaoDevePermitirCadastro() throws Exception {
+        mockMvc.perform(get("/lotes/novo"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/lotes")
+                        .with(csrf())
+                        .param("produtoId", produto.getId().toString())
+                        .param("numero", "LT-NEGADO")
+                        .param("dataValidade", "2027-01-01"))
+                .andExpect(status().isForbidden());
+
+        assertFalse(repository.existsByProdutoIdAndNumero(
+                produto.getId(), "LT-NEGADO"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMINISTRADOR")
+    void nomeDoPerfilNaoDeveSubstituirPermissao() throws Exception {
+        mockMvc.perform(get("/lotes"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/lotes/novo"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"LOTE_VISUALIZAR", "LOTE_CADASTRAR"})
+    void deveNegarOperacaoNaoPrevista() throws Exception {
+        Lote lote = service.cadastrar(
+                produto.getId(), "LT-PRESERVADO", null,
+                LocalDate.of(2027, 1, 1));
+
+        mockMvc.perform(post("/lotes/" + lote.getId() + "/excluir")
+                        .with(csrf()))
+                .andExpect(status().isForbidden());
+
+        assertTrue(repository.existsById(lote.getId()));
     }
 }

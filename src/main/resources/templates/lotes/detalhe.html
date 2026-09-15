@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,35 +27,51 @@
             <div class="form-grid">
                 <div class="field field-full">
                     <span class="detail-label">Produto</span>
-                    <a th:href="@{/produtos/{id}(id=${lote.produto.id})}"
-                       th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}"></a>
+
+                    <a sec:authorize="hasAuthority('PRODUTO_VISUALIZAR')"
+                       th:href="@{/produtos/{id}(id=${lote.produto.id})}"
+                       th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}">
+                    </a>
+
+                    <strong sec:authorize="!hasAuthority('PRODUTO_VISUALIZAR')"
+                            th:text="${lote.produto.codigo + ' — ' + lote.produto.nome}">
+                    </strong>
                 </div>
 
                 <div class="field">
                     <span class="detail-label">Fabricação</span>
                     <strong th:text="${lote.dataFabricacao != null
                         ? #temporals.format(lote.dataFabricacao, 'dd/MM/yyyy')
-                        : 'Não informada'}"></strong>
+                        : 'Não informada'}">
+                    </strong>
                 </div>
 
                 <div class="field">
                     <span class="detail-label">Validade</span>
                     <strong th:text="${lote.dataValidade != null
                         ? #temporals.format(lote.dataValidade, 'dd/MM/yyyy')
-                        : 'Não informada'}"></strong>
+                        : 'Não informada'}">
+                    </strong>
                 </div>
 
                 <div class="field">
                     <span class="detail-label">Situação cadastral</span>
                     <span class="status"
                           th:classappend="${lote.ativo} ? ' status-active' : ' status-inactive'"
-                          th:text="${lote.ativo ? 'Ativo' : 'Inativo'}"></span>
+                          th:text="${lote.ativo ? 'Ativo' : 'Inativo'}">
+                    </span>
                 </div>
             </div>
 
             <div class="form-actions">
                 <a class="button button-ghost" th:href="@{/lotes}">
                     Voltar para lotes
+                </a>
+
+                <a class="button"
+                   sec:authorize="hasAuthority('RASTREABILIDADE_VISUALIZAR')"
+                   th:href="@{/rastreabilidade(loteId=${lote.id})}">
+                    Consultar histórico do lote
                 </a>
             </div>
         </section>

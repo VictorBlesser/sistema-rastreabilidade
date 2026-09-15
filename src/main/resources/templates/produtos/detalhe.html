@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,7 +26,8 @@
 
         <section class="panel form" aria-label="Dados do produto">
             <div class="alert alert-success" role="status"
-                 th:if="${mensagemSucesso}" th:text="${mensagemSucesso}"></div>
+                 th:if="${mensagemSucesso}" th:text="${mensagemSucesso}">
+            </div>
 
             <div class="form-grid">
                 <div class="field">
@@ -41,19 +44,22 @@
                     <span class="detail-label">Descrição</span>
                     <p class="detail-value detail-description"
                        th:text="${produto.descricao != null
-                           ? produto.descricao : 'Não informada'}"></p>
+                           ? produto.descricao : 'Não informada'}">
+                    </p>
                 </div>
 
                 <div class="field">
                     <span class="detail-label">Unidade de medida</span>
                     <strong th:text="${produto.unidadeMedida.name()
-                        + ' — ' + produto.unidadeMedida.rotulo}"></strong>
+                        + ' — ' + produto.unidadeMedida.rotulo}">
+                    </strong>
                 </div>
 
                 <div class="field">
                     <span class="detail-label">Quantidade</span>
                     <strong th:text="${produto.fracionavel
-                        ? 'Fracionável' : 'Não fracionável'}"></strong>
+                        ? 'Fracionável' : 'Não fracionável'}">
+                    </strong>
                 </div>
 
                 <div class="field">
@@ -71,7 +77,8 @@
                     <div>
                         <span class="status"
                               th:classappend="${produto.ativo} ? ' status-active' : ' status-inactive'"
-                              th:text="${produto.ativo ? 'Ativo' : 'Inativo'}"></span>
+                              th:text="${produto.ativo ? 'Ativo' : 'Inativo'}">
+                        </span>
                     </div>
                 </div>
             </div>
@@ -80,7 +87,9 @@
                 <a class="button button-ghost" th:href="@{/produtos}">
                     Voltar para produtos
                 </a>
-                <form th:if="${produto.ativo}"
+
+                <form sec:authorize="hasAuthority('PRODUTO_INATIVAR')"
+                      th:if="${produto.ativo}"
                       th:action="@{/produtos/{id}/inativar(id=${produto.id})}"
                       method="post">
                     <button class="button" type="submit">Inativar produto</button>
