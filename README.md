@@ -1,4 +1,4 @@
-# Sistema de Rastreabilidade
+# Sistema de Rastreabilidade (A ideia é transformar em um sistema de ERP completo com vários módulos)
 
 Sistema interno de rastreabilidade e qualidade, construído em Java com Spring Boot.
 
@@ -22,7 +22,7 @@ Sistema interno de rastreabilidade e qualidade, construído em Java com Spring B
 - [x] Página inicial
 - [x] Estrutura inicial de segurança
 - [x] Especificação do primeiro módulo
-- [ ] Usuários e permissões
+- [ ] Usuários e permissões - fiz algumas alterações no planejamento dessa fase portanto vou demorar bem mais que o esperado inicialmente.(estou nessa fase atualmente)
 - [x] Produtos — cadastro, listagem, consulta e inativação da primeira versão concluídos
 - [ ] Lotes e números de série
 - [ ] Recebimento e estoque
@@ -31,3 +31,4 @@ Sistema interno de rastreabilidade e qualidade, construído em Java com Spring B
 ## Regra do projeto
 
 Nenhum módulo regulado entra em produção apenas porque funciona. Cada requisito deverá possuir avaliação de risco, teste e evidência de aprovação.
+Tudo que está sendo publicado no github não é necessáriamente como o sistema é, pois vou colocar em funcionamento e isso demanda alguns requisitos de segurança. (como estou iniciando pode haver varios pontos falhos nesse quêsito portanto estou estudando e me aprofundando para para corrigir esses erros.)
