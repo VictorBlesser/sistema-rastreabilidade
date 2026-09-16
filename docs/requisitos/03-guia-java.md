@@ -1,290 +1,65 @@
-# Guia rápido de Java para o Sistema de Rastreabilidade
+# Guia Java e Spring do projeto
 
-Este guia é uma lembrança de sintaxe. Os exemplos não foram adicionados às classes do sistema e podem ser adaptados durante a programação.
+Revisão 16/09/2026. Referência de leitura para o código atual; exemplos conceituais não instruem a sobrescrever classes existentes.
 
-## 1. Estrutura básica de uma classe
+## Estrutura e tipos
 
-```java
-package com.portfolio.rastreabilidade.produto;
-
-public class Produto {
-
-    private Long id;
-    private String nome;
-    private boolean ativo;
-
-    public Produto() {
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void inativar() {
-        this.ativo = false;
-    }
-}
-```
-
-Partes importantes:
-
-| Sintaxe | Significado |
+| Sintaxe | Uso |
 |---|---|
-| `package` | Pasta lógica da classe |
-| `public class Produto` | Declara uma classe pública |
-| `private String nome` | Declara um campo acessível apenas pela própria classe |
-| `public Produto()` | Construtor da classe |
-| `void` | Método que não devolve valor |
-| `return nome` | Devolve um valor ao chamador |
-| `this.nome` | Campo `nome` do objeto atual |
-| `;` | Finaliza uma instrução |
+| `package` / `import` | Organização lógica e referência a tipos |
+| `class` / construtor | Define dados/comportamentos e inicializa instâncias |
+| `private` | Limita acesso direto ao campo/método |
+| `final` | Impede reatribuir a referência; não torna o objeto inteiro imutável |
+| `Long` | ID que pode ser null antes da persistência |
+| `boolean` | Estado lógico, como ativo/fracionável |
+| `BigDecimal` | Quantidades decimais; construir a partir de texto quando necessário |
+| `LocalDate` | Data de negócio sem horário |
+| `OffsetDateTime` | Registro de instante com deslocamento de fuso |
+| `enum` | Conjunto fechado de valores, como ENTRADA e SAIDA |
+| `record` | Transporta dados com componentes finais, como MovimentoTela |
 
-## 2. Tipos utilizados no módulo
+Comparação de texto usa `.equals()`, não `==`. `==` em objetos compara referências. Para valor decimal, `compareTo` compara magnitude; `equals` também considera escala. Assim, 1.0 e 1.00 podem ter igualdade numérica por `compareTo` sem igualdade por `equals`.
 
-```java
-String nome = "Cateter";
-Long id = 1L;
-boolean ativo = true;
-Instant criadoEm = Instant.now();
-```
+## Coleções e fluxo
 
-- `String`: texto;
-- `Long`: número inteiro que pode ser `null`, utilizado em identificadores;
-- `long`: número inteiro que nunca é `null`;
-- `boolean`: aceita somente `true` ou `false`;
-- `Instant`: instante de data e hora adequado para registros técnicos.
+`List<T>` mantém sequência; `Set<T>` representa valores sem duplicação. `containsAll` verifica se um conjunto contém todos os elementos do outro, usado para impedir concessão de acessos superiores. `List.copyOf` cria cópia não modificável; não torna todos os elementos profundamente imutáveis.
 
-Para utilizar `Instant`:
+`Optional<T>` representa resultado possivelmente ausente; `orElseThrow` converte ausência em exceção explícita. Em streams, `filter` seleciona, `map` transforma, `flatMap` reúne coleções e `anyMatch` responde se alguma condição foi atendida. `String...` permite quantidade variável de argumentos.
 
-```java
-import java.time.Instant;
-```
+`condicao ? valorA : valorB` escolhe um resultado. `&&`, `||` e `!` significam E, OU e negação. Curto-circuito permite testar null antes de acessar métodos.
 
-## 3. Enum
+## Spring/JPA
 
-Um `enum` limita os valores possíveis:
-
-```java
-package com.portfolio.rastreabilidade.produto;
-
-public enum TipoProduto {
-    MEDICAMENTO,
-    PRODUTO_MEDICO,
-    DIAGNOSTICO_IN_VITRO
-}
-```
-
-Uso:
-
-```java
-TipoProduto tipo = TipoProduto.PRODUTO_MEDICO;
-```
-
-## 4. Método com parâmetro e retorno
-
-```java
-public Produto buscarPorId(Long id) {
-    Produto produto = repository.findById(id).orElseThrow();
-    return produto;
-}
-```
-
-Leitura da assinatura:
-
-```text
-public       pode ser chamado por outras classes
-Produto      tipo devolvido pelo método
-buscarPorId  nome do método
-Long id      parâmetro recebido
-```
-
-## 5. Condições
-
-```java
-if (nome == null || nome.isBlank()) {
-    throw new IllegalArgumentException("O nome é obrigatório");
-}
-```
-
-Operadores comuns:
-
-| Operador | Significado |
+| Recurso | Efeito no projeto |
 |---|---|
-| `==` | Igualdade de valores primitivos ou mesma referência |
-| `!=` | Diferente |
-| `&&` | E |
-| `\|\|` | Ou |
-| `!` | Negação |
+| `@Controller` | Recebe rotas e seleciona templates |
+| `@GetMapping` / `@PostMapping` | Mapeia método HTTP e caminho |
+| `@ModelAttribute` | Vincula formulário ou fornece dado à tela |
+| `@Valid` / BindingResult | Valida entrada e reúne erros |
+| `@Service` / `@Component` | Disponibiliza componente para injeção |
+| Injeção pelo construtor | Explicita dependências necessárias |
+| `@Transactional` | Delimita transação quando chamado através do proxy Spring |
+| `@Entity`, `@Id`, `@Column` | Mapeiam entidade, identidade e coluna |
+| `@ManyToMany`, `@JoinTable` | Representam vínculos de usuários/perfis/permissões |
+| `@EntityGraph` | Define associações necessárias na consulta |
+| `@Lock` | Solicita bloqueio de banco na consulta correspondente |
 
-Para comparar textos, utilize `.equals()`:
+Chamadas internas na mesma instância não criam automaticamente uma nova transação por anotação. `saveAndFlush` sincroniza SQL, mas não é sinônimo de commit: falha posterior ainda pode reverter a transação.
 
-```java
-if (codigo.equals("CAT-001")) {
-    // Os textos são iguais.
-}
-```
+## Segurança e interface
 
-Para evitar erro quando o primeiro texto pode ser `null`:
+`SecurityContextHolder` fornece a autenticação da execução atual; não aceitar login do operador vindo de campo do formulário. Role é expressa como autoridade `ROLE_...`; permissões como `USUARIO_CRIAR` são autoridades específicas. `allOf` exige todos os controles; `hasAnyRole` aceita uma das roles listadas.
 
-```java
-if ("CAT-001".equals(codigo)) {
-    // Comparação segura.
-}
-```
+`AccessDeniedException` interrompe acesso não autorizado. `sec:authorize` controla o HTML gerado, mas não substitui autorização no servidor. `th:if` aplica condição; `th:text` exibe texto; `th:action`/`th:href` montam URLs; `th:block` agrupa sem produzir tag própria.
 
-## 6. Listas
+## Testes e erros já encontrados
 
-```java
-import java.util.List;
+- `@Test` identifica cenário; `@BeforeEach` prepara; `@AfterEach` limpa contexto manual.
+- `@WithUserDetails` usa usuário carregado pelo serviço; `@WithMockUser` simula autenticação. São evidências diferentes.
+- Mockito: preparar outro mock antes de iniciar `when(...).thenReturn(...)`; criar/configurar um mock dentro do argumento de `thenReturn` pode causar `UnfinishedStubbing`.
+- `assertThrows` exige a exceção; `verify(..., never())` verifica ausência de chamada, não substitui conferir estado persistido em integração.
+- MockMvc `xpath` espera XML. HTML válido com tags vazias pode não ser XML válido; não deformar o HTML para satisfazer um parser inadequado.
+- Classes de produção ficam em `src/main/java`; testes em `src/test/java`. Duplicar uma classe de produção com o mesmo pacote/nome nos testes pode mascarar o comportamento real.
+- Uma classe terminada em Test, porém sem cenários, não fornece cobertura. `clean test` elimina bytecode antigo antes da contagem.
 
-List<Produto> produtos = repository.findAll();
-
-for (Produto produto : produtos) {
-    System.out.println(produto.getNome());
-}
-```
-
-`List<Produto>` significa uma lista que aceita objetos da classe `Produto`.
-
-## 7. Optional
-
-Uma busca pode ou não encontrar um produto. O `Optional` representa essa possibilidade:
-
-```java
-import java.util.Optional;
-
-Optional<Produto> resultado = repository.findById(id);
-```
-
-Exemplo direto:
-
-```java
-Produto produto = repository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
-```
-
-## 8. Interface e Spring Data
-
-Uma interface define operações sem precisar implementar todas elas no mesmo arquivo:
-
-```java
-public interface ProdutoRepository {
-    Produto salvar(Produto produto);
-}
-```
-
-No projeto, o `ProdutoRepository` já estende uma interface do Spring:
-
-```java
-public interface ProdutoRepository extends JpaRepository<Produto, Long> {
-    boolean existsByCodigoIgnoreCase(String codigo);
-}
-```
-
-`Produto` indica a entidade administrada. `Long` indica o tipo do identificador. Métodos como `save` e `findAll` são herdados de `JpaRepository`.
-
-O nome `existsByCodigoIgnoreCase` é interpretado pelo Spring:
-
-```text
-exists     verifica se existe
-ByCodigo   utiliza o campo codigo
-IgnoreCase ignora diferença entre maiúsculas e minúsculas
-```
-
-## 9. Anotações
-
-Anotações começam com `@` e fornecem instruções ao Spring ou ao JPA:
-
-```java
-@Entity
-public class Produto {
-}
-```
-
-Exemplos que aparecerão no módulo:
-
-| Anotação | Finalidade |
-|---|---|
-| `@Entity` | Indica uma entidade persistida |
-| `@Id` | Identifica a chave primária |
-| `@GeneratedValue` | Solicita geração automática do identificador |
-| `@Service` | Identifica uma classe de regras de negócio |
-| `@Controller` | Identifica uma classe que recebe ações web |
-| `@GetMapping` | Mapeia uma consulta do navegador |
-| `@PostMapping` | Mapeia o envio de um formulário |
-| `@Valid` | Solicita validação dos dados recebidos |
-
-## 10. Injeção pelo construtor
-
-O `Service` precisa utilizar o `Repository`. A ligação pode ser recebida no construtor:
-
-```java
-public class ProdutoService {
-
-    private final ProdutoRepository repository;
-
-    public ProdutoService(ProdutoRepository repository) {
-        this.repository = repository;
-    }
-}
-```
-
-`final` significa que a referência deverá ser definida no construtor e não poderá ser substituída depois.
-
-## 11. Convenções de nomes
-
-```text
-Classe e enum:       Produto, TipoProduto
-Método e variável:   buscarPorId, produtoEncontrado
-Constante:           TAMANHO_MAXIMO
-Pacote:              produto
-Arquivo:             mesmo nome da classe pública
-```
-
-Java diferencia maiúsculas e minúsculas. `Produto`, `produto` e `PRODUTO` são nomes diferentes.
-
-## 12. Sequência de desenvolvimento
-
-As etapas iniciais concluídas foram:
-
-1. Crie `TipoProduto.java`.
-2. Confirme que o projeto ainda compila.
-3. Crie a estrutura inicial de `Produto.java`.
-4. Adicione poucos campos por vez.
-5. Corrija os avisos antes de continuar.
-6. Avance para banco, repositório e serviço.
-
-O projeto já concluiu essa sequência, a validação do formulário e a criação do controlador web. A etapa atual é criar os templates de listagem e cadastro.
-
-Quando ocorrer um erro, leia primeiro a primeira mensagem que aponta para um arquivo do seu projeto. Anote o nome do arquivo, a linha e a mensagem; essas três informações normalmente são suficientes para investigar o problema.
-
-## 13. Estrutura de um teste com Mockito
-
-O teste do serviço substitui temporariamente o repositório real por um objeto controlado chamado `mock`:
-
-```java
-when(repository.existsByCodigoIgnoreCase("CAT-001"))
-        .thenReturn(true);
-
-IllegalArgumentException erro = assertThrows(
-        IllegalArgumentException.class,
-        () -> service.cadastrar(produto)
-);
-
-assertEquals("Código já cadastrado", erro.getMessage());
-verify(repository, never()).save(produto);
-```
-
-Leitura do teste:
-
-| Trecho | Significado |
-|---|---|
-| `when(...).thenReturn(true)` | Prepara a resposta simulada do repositório |
-| `assertThrows` | Confirma que a operação lançou a exceção esperada |
-| `assertEquals` | Compara o resultado esperado com o resultado obtido |
-| `verify` | Confirma se um método foi ou não chamado |
-| `never()` | Exige que `save` não seja executado |
+O projeto já possui templates e vários módulos; a etapa atual não é mais criar a primeira tela de Produtos. [Roadmap atualizado](../01-estado-e-roadmap.md).

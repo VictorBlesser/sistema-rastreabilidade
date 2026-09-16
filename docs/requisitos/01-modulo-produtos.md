@@ -1,176 +1,54 @@
-# Requisitos — Cadastro de Produtos
+# Requisitos — Produtos
 
-## Estado da implementação em 3 de setembro de 2026
+Revisão 16/09/2026. Atualiza o escopo básico documentado em 03/09/2026. Fonte: [pacote produto](../../src/main/java/com/portfolio/rastreabilidade/produto/), migrações V2/V6 e testes do módulo.
 
-| Item | Estado | Evidência atual |
+## Objetivo e escopo
+
+Cadastrar produtos que serão referenciados por lotes e movimentações. Cadastro, listagem, detalhes e inativação estão implementados. Edição geral/técnica, cadastro de fabricante/fornecedor, anexos e auditoria de alterações ainda não estão implementados.
+
+## Requisitos preservados e ampliados
+
+| ID | Regra | Estado |
 |---|---|---|
-| Entidade `Produto` e enum `TipoProduto` | Implementado | Classes Java e mapeamento JPA |
-| Tabela `produto` | Implementado | Migração `V2__criar_tabela_produto.sql` |
-| Acesso ao banco | Implementado | `ProdutoRepository` estende `JpaRepository` |
-| Cadastro pelo serviço | Implementado | `ProdutoService.cadastrar()` e teste unitário |
-| Recusa de código duplicado | Implementado e testado | `existsByCodigoIgnoreCase` e `deveRecusarCadastroQuandoCodigoJaExiste` |
-| Listagem por nome | Implementado e testado | `ProdutoService.listar()` e `deveListarProdutosOrdenadosPorNome` |
-| Consulta por identificador no serviço | Implementado e testado | `ProdutoService.buscarPorId()` e dois testes unitários |
-| Criação como ativo e inativação | Implementado e testado | Métodos e testes da entidade `Produto` |
-| Inativação pelo serviço | Implementado e testado | `ProdutoService.inativar()` e teste unitário |
-| Rota web de inativação | Implementado e testado | `ProdutoController.inativar()` e dois testes de controlador |
-| Normalização do código | Implementado e testado | Construtor de `Produto` e `deveNormalizarCodigoDoProduto` |
-| Validação dos campos obrigatórios | Implementado e testado | Construtor e testes de código, nome e tipo |
-| Objeto de entrada do formulário | Implementado | `ProdutoForm` com validações Jakarta |
-| Rotas web de listagem e cadastro | Implementado e testado | `ProdutoController` e `ProdutoControllerTest` |
-| Rota web de consulta por identificador | Implementado e testado | `ProdutoController.detalhar()` e dois testes de controlador |
-| Telas de listagem e cadastro | Implementado e testado | Templates Thymeleaf e testes de integração de renderização |
-| Tela de consulta pelo navegador | Implementado e testado | Template `detalhe.html` e teste de integração |
-| Inativação pelo navegador | Implementado e testado | Serviço, rota, botão e teste integrado com banco H2 |
-| Edição pelo navegador | Evolução futura | Não faz parte do escopo da primeira versão |
+| REQ-PRO-001 | Cadastrar produto | Implementado |
+| REQ-PRO-002 | Código interno único | Implementado |
+| REQ-PRO-003 | Código, nome e tipo obrigatórios | Implementado |
+| REQ-PRO-004 | Indicar controle de lote | Implementado |
+| REQ-PRO-005 | Indicar controle de validade | Implementado |
+| REQ-PRO-006 | Listar produtos | Implementado |
+| REQ-PRO-007 | Consultar por ID | Implementado |
+| REQ-PRO-008 | Rejeitar código duplicado | Implementado no serviço e banco |
+| REQ-PRO-009 | Inativar produto | Implementado |
+| REQ-PRO-010 | Preservar cadastro utilizado | Sem rota de exclusão; proteção abrangente de histórico permanece requisito |
+| REQ-PRO-011 | Remover espaços externos e converter código para maiúsculas | Implementado |
+| REQ-PRO-012 | Registrar criação/atualização do produto | Pendente: campos temporais não existem na entidade atual |
+| REQ-PRO-013 | Informar unidade e permitir/proibir fracionamento | Implementado na V6 e entidade |
+| REQ-PRO-014 | Separar consulta, cadastro e inativação por permissão | Implementado nas rotas e interface |
 
-`Implementado` significa presente no código atual. Não significa que o módulo esteja validado ou liberado para produção.
+## Dicionário atual
 
-## 1. Objetivo
+| Campo | Tipo Java | Regra |
+|---|---|---|
+| id | Long | Gerado pelo banco |
+| codigo | String | Até 50, obrigatório, normalizado e único |
+| nome | String | Até 150, obrigatório |
+| descricao | String | Até 500, opcional |
+| tipo | TipoProduto | MEDICAMENTO, PRODUTO_MEDICO ou DIAGNOSTICO_IN_VITRO |
+| controlaLote / controlaValidade | boolean | Controles utilizados pelos módulos operacionais |
+| fracionavel | boolean | false exige quantidade inteira |
+| unidadeMedida | UnidadeMedida | UN, CX, PCT, KG, G, L, ML ou M |
+| ativo | boolean | Novo produto inicia ativo |
 
-Permitir o cadastro e a consulta dos produtos controlados pelo Sistema de Rastreabilidade. O cadastro será a base para os módulos futuros de lotes, recebimento, estoque, expedição, devolução e rastreabilidade.
+Fracionável/não fracionável é uma classificação da quantidade, independente do tipo de produto. Não existe conversão automática entre caixa, unidade ou outras unidades. Quantidade usa BigDecimal, deve ser positiva; precisão/escala dos itens são também validadas pelos módulos de movimentação.
 
-## 2. Escopo da primeira versão
+## Autorizações e aceite
 
-Esta versão deverá permitir:
+GET de lista/detalhes exige `PRODUTO_VISUALIZAR`; cadastro exige `PRODUTO_CADASTRAR`; inativação exige `PRODUTO_INATIVAR`. Permissões técnicas catalogadas não liberam automaticamente o cadastro geral. Usuário somente de consulta não deve ver os controles de escrita nem conseguir executar POST direto.
 
-- cadastrar um produto;
-- listar os produtos cadastrados;
-- consultar um produto;
-- identificar seu tipo;
-- informar se ele exige controle de lote;
-- informar se ele exige controle de validade;
-- inativar um produto sem apagar seu histórico.
+Critérios: código ` cat-001 ` vira `CAT-001`; repetição é recusada; inativação preserva ID; quantidade 1,5 é recusada para produto não fracionável; a unidade permanece associada ao produto.
 
-Não fazem parte desta primeira versão:
+## Evidências
 
-- saldo de estoque;
-- cadastro de lotes e números de série;
-- fabricantes e fornecedores em tabelas próprias;
-- documentos anexos;
-- registro completo de auditoria;
-- aprovação eletrônica do cadastro;
-- exclusão física de produtos.
+`ProdutoTest`, `ProdutoQuantidadeTest`, `ProdutoServiceTest`, `ProdutoControllerTest`, `ProdutoPermissaoWebTest`, `BotoesCadastroWebTest` e `SistemaRastreabilidadeApplicationTests`. Contagens e execução consolidada estão em [validação](../10-validacao-e-evidencias.md).
 
-## 3. Usuários envolvidos
-
-| Papel | Responsabilidade inicial |
-|---|---|
-| Cadastrador | Preencher os dados do produto |
-| Qualidade | Revisar regras e campos regulatórios |
-| Administrador | Inativar cadastros quando autorizado |
-| Consultor | Pesquisar e visualizar produtos |
-
-Os perfis serão implementados em um módulo posterior. Nesta etapa, eles servem para orientar as decisões de projeto.
-
-## 4. Requisitos funcionais
-
-| Código | Requisito | Prioridade |
-|---|---|---:|
-| REQ-PRO-001 | O sistema deve permitir cadastrar um produto | Alta |
-| REQ-PRO-002 | Cada produto deve possuir um código interno único | Alta |
-| REQ-PRO-003 | Código, nome e tipo devem ser obrigatórios | Alta |
-| REQ-PRO-004 | O sistema deve informar se o produto exige controle de lote | Alta |
-| REQ-PRO-005 | O sistema deve informar se o produto exige controle de validade | Alta |
-| REQ-PRO-006 | O sistema deve listar os produtos cadastrados | Alta |
-| REQ-PRO-007 | O sistema deve permitir consultar um produto pelo identificador | Alta |
-| REQ-PRO-008 | O sistema deve impedir dois produtos com o mesmo código | Alta |
-| REQ-PRO-009 | O sistema deve permitir inativar um produto | Média |
-| REQ-PRO-010 | O sistema não deve excluir fisicamente um produto utilizado | Alta |
-| REQ-PRO-011 | O código deve ser armazenado sem espaços nas extremidades e em letras maiúsculas | Média |
-| REQ-PRO-012 | O sistema deve registrar quando o produto foi criado e atualizado | Alta |
-
-## 5. Tipos de produto iniciais
-
-| Valor interno | Exibição esperada |
-|---|---|
-| MEDICAMENTO | Medicamento |
-| PRODUTO_MEDICO | Produto médico |
-| DIAGNOSTICO_IN_VITRO | Diagnóstico in vitro |
-
-Esses valores deverão ser definidos pelo `enum` `TipoProduto`, evitando textos diferentes para o mesmo conceito.
-
-## 6. Dicionário de dados
-
-| Campo | Tipo Java sugerido | Obrigatório | Regra |
-|---|---|---:|---|
-| id | `Long` | Gerado | Identificador interno imutável |
-| codigo | `String` | Sim | Único, sem espaços externos e em maiúsculas |
-| nome | `String` | Sim | Nome utilizado pela empresa |
-| descricao | `String` | Não | Informação complementar |
-| tipo | `TipoProduto` | Sim | Um dos valores definidos no enum |
-| controlaLote | `boolean` | Sim | Indica necessidade de rastreabilidade por lote |
-| controlaValidade | `boolean` | Sim | Indica controle de vencimento |
-| ativo | `boolean` | Sim | Novo produto começa ativo |
-| criadoEm | `Instant` | Automático | Data e hora da criação |
-| atualizadoEm | `Instant` | Automático | Data e hora da última alteração |
-
-## 7. Regras de negócio
-
-### RN-PRO-001 — Código único
-
-Antes de salvar, o sistema deve verificar, sem diferenciar letras maiúsculas e minúsculas, se já existe outro produto com o mesmo código. A tabela também deve manter uma restrição de unicidade como segunda proteção.
-
-### RN-PRO-002 — Normalização do código
-
-O código deve ter os espaços externos removidos e ser convertido para letras maiúsculas. Exemplo: ` cat-001 ` torna-se `CAT-001`.
-
-### RN-PRO-003 — Inativação em vez de exclusão
-
-Um produto não deve desaparecer do histórico. Quando deixar de ser utilizado, deverá passar de ativo para inativo.
-
-### RN-PRO-004 — Responsabilidade das camadas
-
-O `Controller` recebe a ação do navegador. O `Service` executa as regras de negócio. O `Repository` acessa o banco. A entidade `Produto` representa os dados persistidos.
-
-## 8. Critérios de aceitação
-
-| Cenário | Resultado esperado |
-|---|---|
-| Cadastrar código, nome e tipo válidos | Produto salvo como ativo |
-| Tentar cadastrar sem nome | Cadastro recusado e mensagem apresentada |
-| Tentar cadastrar código repetido | Cadastro recusado e duplicidade informada |
-| Informar código com espaços e letras minúsculas | Código normalizado antes de ser salvo |
-| Inativar produto | Produto permanece no banco com `ativo = false` |
-| Consultar identificador inexistente | Sistema informa que o produto não foi encontrado |
-
-## 9. Rastreabilidade dos testes atuais
-
-| Teste | Regra ou requisito verificado |
-|---|---|
-| `deveCriarProdutoAtivo` | Novo produto inicia com `ativo = true` |
-| `deveInativarProduto` | RN-PRO-003 e REQ-PRO-009 |
-| `deveInativarProdutoPeloServico` | RN-PRO-003 e REQ-PRO-009 pela camada de serviço |
-| `deveCadastrarProdutoQuandoCodigoNaoExiste` | REQ-PRO-001 |
-| `deveRecusarCadastroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 |
-| `deveListarProdutosOrdenadosPorNome` | REQ-PRO-006 |
-| `deveBuscarProdutoPorId` | REQ-PRO-007 |
-| `deveInformarQuandoProdutoNaoExiste` | REQ-PRO-007 e cenário de identificador inexistente |
-| `deveNormalizarCodigoDoProduto` | RN-PRO-002 e REQ-PRO-011 |
-| `deveRecusarCodigoEmBranco` | REQ-PRO-003 |
-| `deveRecusarNomeEmBranco` | REQ-PRO-003 |
-| `deveRecusarTipoNulo` | REQ-PRO-003 |
-| `deveNormalizarNomeEDescricaoDoProduto` | Preservação e normalização dos dados opcionais do formulário |
-| `deveListarProdutos` | REQ-PRO-006 pela rota web |
-| `deveExibirFormularioDeCadastro` | REQ-PRO-001 pela rota web |
-| `deveCadastrarProdutoValido` | REQ-PRO-001 e REQ-PRO-011 pela rota web |
-| `deveRecusarFormularioInvalido` | REQ-PRO-003 pela rota web |
-| `deveExibirErroQuandoCodigoJaExiste` | RN-PRO-001, REQ-PRO-002 e REQ-PRO-008 pela rota web |
-| `deveExibirDetalhesDoProduto` | REQ-PRO-007 pela rota web |
-| `deveRedirecionarQuandoProdutoNaoExiste` | REQ-PRO-007 e tratamento de identificador inexistente pela rota web |
-| `deveInativarProduto` em `ProdutoControllerTest` | RN-PRO-003 e REQ-PRO-009 pela rota web |
-| `deveRedirecionarQuandoProdutoParaInativarNaoExiste` | Tratamento de identificador inexistente na inativação |
-| `contextLoads` | A aplicação Spring inicia no perfil de testes e valida as migrações |
-| `deveRenderizarListaDeProdutos` | Templates exibem os dados e controles do produto |
-| `deveRenderizarFormularioDeProduto` | Formulário de cadastro é renderizado com os campos esperados |
-| `deveRenderizarDetalhesDeProduto` | REQ-PRO-007 com rota, banco de testes e template Thymeleaf integrados |
-| `deveInativarProdutoPelaTela` | RN-PRO-003 e REQ-PRO-009 com controlador, serviço, repositório e banco integrados |
-
-## 10. Referências do projeto
-
-- RDC 430/2020;
-- RDC 665/2022;
-- Guia Anvisa nº 33/2020;
-- procedimentos internos e requisitos regulatórios aplicáveis.
-
-A correspondência entre cada requisito do sistema, os artigos aplicáveis e os procedimentos internos será detalhada em uma futura matriz de rastreabilidade regulatória.
+As referências regulatórias registradas na versão inicial são contexto histórico. Esta revisão técnica não verifica sua aplicabilidade ou vigência, nem declara o módulo validado para produção.

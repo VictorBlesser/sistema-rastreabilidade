@@ -1,47 +1,41 @@
-# Documentação do Sistema de Rastreabilidade
+# Documentação funcional, técnica e de gestão
 
-Esta pasta reúne a documentação funcional e técnica do projeto. Ela deve evoluir junto com o código.
+Revisão: **16/09/2026**. Base: `5153f62`. Esta revisão substitui a visão limitada ao módulo Produtos de 03/09/2026.
 
-## Módulo atual: Produtos
+## Classificação
 
-1. [Requisitos do módulo](requisitos/01-modulo-produtos.md)
-2. [Diagramas de classes e objetos](requisitos/02-diagramas-produtos.md)
-3. [Guia rápido de sintaxe Java](requisitos/03-guia-java.md)
-4. [Registro de andamento](requisitos/04-andamento-produtos.md)
+- **Implementado:** identificado no código, classe ou migração.
+- **Parcial:** parte do processo existe, mas faltam controles ou fluxos.
+- **Planejado/proposto:** especificação ou decisão futura; não é funcionalidade disponível.
+- **Evidência histórica:** execução anterior que não comprova a revisão atual.
 
-## Estado atual
+## Mapa documental
 
-Atualizado em 3 de setembro de 2026.
+| Documento | Conteúdo |
+|---|---|
+| [Estado e roadmap](01-estado-e-roadmap.md) | MVP/ERP, pendências e critérios de conclusão |
+| [Requisitos ERP](requisitos/05-requisitos-erp.md) | Regras por módulo e relação com testes |
+| [Produtos](requisitos/01-modulo-produtos.md) | Dados e regras do cadastro |
+| [Diagramas de Produtos](requisitos/02-diagramas-produtos.md) | Classes e comportamento |
+| [Guia Java](requisitos/03-guia-java.md) | Sintaxe e armadilhas encontradas |
+| [Andamento de Produtos](requisitos/04-andamento-produtos.md) | Histórico e situação atual |
+| [Estrutura computacional](arquitetura/01-estrutura-computacional.md) | Camadas, execução, persistência e ambientes |
+| [UML](arquitetura/02-uml.md) | Classes, associações, sequência e estados |
+| [Sistemas distribuídos](arquitetura/03-sistemas-distribuidos.md) | Concorrência e evolução |
+| [Segurança](seguranca/01-perfis-permissoes.md) | Autorizações, hierarquia, sessões e lacunas |
+| [Estrutura organizacional](gestao/01-estrutura-organizacional.md) | Responsabilidades e RACI proposto |
+| [Serviços e fornecedores](gestao/02-servicos-e-fornecedores.md) | Catálogo, incidentes, mudanças e continuidade |
+| [Indicadores](gestao/03-indicadores-desempenho.md) | Fórmulas, fontes, responsáveis e periodicidade |
+| [Data analytics](dados/01-data-analytics.md) | Modelo analítico, qualidade, linhagem e acesso |
+| [Big data](dados/02-big-data.md) | Critérios de adoção e arquitetura futura condicional |
+| [Validação](10-validacao-e-evidencias.md) | Execuções, resultados e lacunas |
 
-- progresso estimado do projeto completo: 20%;
-- progresso estimado do módulo Produtos: 100% da primeira versão;
-- entidade, tabela, repositório e serviço básicos implementados;
-- criação como ativo, inativação, recusa de código duplicado e listagem ordenada cobertas por testes;
-- normalização do código implementada e coberta por teste;
-- código, nome e tipo são validados como campos obrigatórios;
-- `ProdutoForm` implementado com validações e conversão segura para `Produto`;
-- `ProdutoController` implementado com rotas de listagem, cadastro e consulta por identificador, cobertas por testes;
-- telas de cadastro e listagem implementadas e cobertas por testes de renderização;
-- consulta por identificador implementada e testada no serviço, no controlador e na tela;
-- regra de inativação implementada e testada no serviço, sem exclusão do registro;
-- rota de inativação implementada e testada no controlador;
-- botão de inativação implementado e validado por teste integrado com banco H2;
-- os 27 testes automatizados passam com o JDK 25.0.4.1;
-- edição de produtos fica planejada para uma evolução posterior.
+## Fontes internas
 
-Os percentuais servem apenas para acompanhar o desenvolvimento. Eles não representam aprovação regulatória nem validação para uso em produção.
+[pom.xml](../pom.xml), [configuração local](../src/main/resources/application.properties), [configuração de testes](../src/test/resources/application-test.properties), [código Java](../src/main/java/com/portfolio/rastreabilidade/), [migrações](../src/main/resources/db/migration/), [templates](../src/main/resources/templates/) e [testes](../src/test/java/com/portfolio/rastreabilidade/).
 
-## Regra de trabalho
+Propostas organizacionais, metas, modelo analítico e estratégia distribuída dependem de decisões do negócio. Não foram inventados contratos, fornecedores homologados, medições operacionais ou aprovações regulatórias.
 
-Antes de implementar uma funcionalidade:
+## Manutenção
 
-1. identificar o requisito;
-2. entender a regra de negócio;
-3. programar uma pequena parte;
-4. testar o comportamento;
-5. guardar a evidência do teste;
-6. revisar e criar um commit.
-
-A documentação deve ser revisada ao concluir uma regra relevante, antes de cada commit e no encerramento de cada dia de desenvolvimento.
-
-> Esta documentação é uma base de desenvolvimento. A relação definitiva com requisitos regulatórios deverá ser revisada e aprovada pelo responsável técnico e pela Garantia da Qualidade antes do uso em produção.
+Ao concluir uma entrega, atualizar requisito, diagrama, autorização, evidência e pendências. Registrar versão e data dos testes. Nunca incluir senhas, hashes ou dados reais nos exemplos. O aceite produtivo exige validação própria, além dos testes de desenvolvimento.
