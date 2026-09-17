@@ -4,6 +4,7 @@ Revisão 16/09/2026. **Modelo proposto para organizar o ERP**, não organograma 
 
 ## Áreas e decisões
 
+
 | Área | Responsabilidade de negócio | Limite |
 |---|---|---|
 | Diretoria | Aprovar políticas, riscos, acessos de administradores e prioridades | Não substituir decisões técnicas fora de sua atribuição |
