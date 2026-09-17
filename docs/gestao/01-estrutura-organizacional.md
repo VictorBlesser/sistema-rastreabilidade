@@ -2,7 +2,7 @@
 
 Revisão 16/09/2026. **Modelo proposto para organizar o ERP**, não organograma formal já aprovado nem afirmação sobre cargos ocupados. Pessoas e substitutos devem ser nomeados pela organização.
 
-## Áreas e decisões
+## Áreas 
 
 
 | Área | Responsabilidade de negócio | Limite |
